@@ -9,6 +9,7 @@ import '../../models/cat.dart';
 import '../../models/health_log.dart';
 import '../../data/life_stages.dart';
 import '../../widgets/weight_widget.dart';
+import '../../widgets/cat_3d_viewer.dart';
 import '../../services/health_service.dart';
 
 const _tips = [
@@ -246,68 +247,62 @@ class _CatHeroCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              // Avatar
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: Colors.white24,
-                backgroundImage: cat.photoUrl != null
-                    ? NetworkImage(cat.photoUrl!)
-                    : null,
-                child: cat.photoUrl == null
-                    ? Text(cat.name.substring(0, 2).toUpperCase(),
-                        style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white))
-                    : null,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          // Modelo 3D compacto
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            child: Cat3DViewerCompact(
+              color: cat.color,
+              breed: cat.breed,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    Text(cat.name,
-                        style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white)),
-                    Text(age,
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 14)),
-                    if (stage != null)
-                      Container(
-                        margin: const EdgeInsets.only(top: 6),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white24,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text('${stage.emoji} ${stage.label}',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(cat.name,
+                              style: const TextStyle(
+                                  fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
+                          Text(age,
+                              style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                          if (stage != null)
+                            Container(
+                              margin: const EdgeInsets.only(top: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white24,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text('${stage.emoji} ${stage.label}',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600)),
+                            ),
+                        ],
                       ),
+                    ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () => context.push('/cats/${cat.id}'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
-                side: const BorderSide(color: Colors.white38),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-              ),
-              child: const Text('Ver perfil completo'),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => context.push('/cats/${cat.id}'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white38),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text('Ver perfil completo'),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

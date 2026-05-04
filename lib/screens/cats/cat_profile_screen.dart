@@ -8,6 +8,7 @@ import '../../data/life_stages.dart';
 import '../../models/health_log.dart';
 import '../../models/vaccine.dart';
 import '../../widgets/cat_share_card.dart';
+import '../../widgets/cat_3d_viewer.dart';
 import 'cat_gallery_screen.dart';
 
 // Datos demo para estadísticas
@@ -80,39 +81,50 @@ class CatProfileScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Hero card
+          // Hero card con modelo 3D
           AnimatedContainer(
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOut,
-            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               gradient: catTheme.heroGradient,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Column(
               children: [
-                CircleAvatar(
-                  radius: 52,
-                  backgroundColor: Colors.white24,
-                  backgroundImage: cat.photoUrl != null ? NetworkImage(cat.photoUrl!) : null,
-                  child: cat.photoUrl == null
-                      ? Text(cat.name.substring(0, 2).toUpperCase(),
-                          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white))
-                      : null,
-                ),
-                const SizedBox(height: 12),
-                Text(cat.name,
-                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white)),
-                Text(age, style: const TextStyle(color: Colors.white70, fontSize: 15)),
-                if (stage != null) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                    decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(20)),
-                    child: Text('${stage.emoji} ${stage.label}',
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                // Modelo 3D
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  child: Cat3DViewer(
+                    color: cat.color,
+                    breed: cat.breed,
+                    height: 260,
+                    autoRotate: true,
+                    showControls: true,
                   ),
-                ],
+                ),
+                // Info del gato debajo del modelo
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                  child: Column(
+                    children: [
+                      Text(cat.name,
+                          style: const TextStyle(
+                              fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white)),
+                      Text(age, style: const TextStyle(color: Colors.white70, fontSize: 15)),
+                      if (stage != null) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                          decoration: BoxDecoration(
+                              color: Colors.white24, borderRadius: BorderRadius.circular(20)),
+                          child: Text('${stage.emoji} ${stage.label}',
+                              style: const TextStyle(
+                                  color: Colors.white, fontWeight: FontWeight.w600)),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
