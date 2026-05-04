@@ -1,35 +1,42 @@
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../core/api/api_client.dart';
 import '../models/user_profile.dart';
 
 class AuthService {
-  static const _clientId =
-      '1057417146171-hcv6s2317p86dtef7va89g6q9ehrfd7q.apps.googleusercontent.com';
-  static const _redirectUri = 'http://localhost';
+  static final _googleSignIn = GoogleSignIn(
+    serverClientId: '1057417146171-7tbgg2ulho9falmt8qhf4ip61v1h722n.apps.googleusercontent.com',
+    scopes: ['openid', 'email', 'profile'],
+  );
 
   static Future<UserProfile> signInWithGoogle() async {
-    final authUrl = Uri.https('accounts.google.com', '/o/oauth2/v2/auth', {
-      'client_id': _clientId,
-      'redirect_uri': _redirectUri,
-      'response_type': 'code',
-      'scope': 'openid email profile',
-      'access_type': 'offline',
-      'prompt': 'select_account',
-    });
+    await _googleSignIn.signOut();
+    
+    GoogleSignInAccount? googleUser;
+    try {
+      googleUser = await _googleSignIn.signIn();
+    } catch (e) {
+      throw Exception('Error en Google Sign-In: $e');
+    }
+    
+    if (googleUser == null) {
+      // Intentar signInSilently como fallback
+      googleUser = await _googleSignIn.signInSilently();
+    }
+    
+    if (googleUser == null) throw Exception('Login cancelado por el usuario');
 
-    final result = await FlutterWebAuth2.authenticate(
-      url: authUrl.toString(),
-      callbackUrlScheme: 'http',
-      options: const FlutterWebAuth2Options(preferEphemeral: true),
-    );
+    GoogleSignInAuthentication googleAuth;
+    try {
+      googleAuth = await googleUser.authentication;
+    } catch (e) {
+      throw Exception('Error obteniendo tokens: $e');
+    }
 
-    final code = Uri.parse(result).queryParameters['code'];
-    if (code == null) throw Exception('No se recibió el código de autorización');
+    final idToken = googleAuth.idToken;
+    if (idToken == null) throw Exception('No se obtuvo el ID token. Verifica que Google Sign-In esté habilitado en Firebase Auth.');
 
-    final response = await ApiClient.dio.post('/auth/google/desktop', data: {
-      'code': code,
-      'redirect_uri': _redirectUri,
-      'client_id': _clientId,
+    final response = await ApiClient.dio.post('/auth/google', data: {
+      'id_token': idToken,
     });
 
     final token = response.data['token'] as String;
@@ -38,7 +45,10 @@ class AuthService {
   }
 
   static Future<void> signOut() async {
-    await ApiClient.clearToken();
+    await Future.wait([
+      _googleSignIn.signOut(),
+      ApiClient.clearToken(),
+    ]);
   }
 
   static Future<bool> isLoggedIn() async {

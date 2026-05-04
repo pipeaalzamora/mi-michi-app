@@ -2,12 +2,12 @@
   "project_info": {
     "project_number": "1057417146171",
     "project_id": "proyectos-hobbys-495300",
-    "storage_bucket": ""
+    "storage_bucket": "proyectos-hobbys-495300.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1057417146171:android:mimichi",
+        "mobilesdk_app_id": "1:1057417146171:android:ca8e8d0a9e375dd86ed11e",
         "android_client_info": {
           "package_name": "com.mimichi.mi_michi"
         }
@@ -22,16 +22,25 @@
           }
         },
         {
-          "client_id": "1057417146171-hcv6s2317p86dtef7va89g6q9ehrfd7q.apps.googleusercontent.com",
+          "client_id": "1057417146171-7tbgg2ulho9falmt8qhf4ip61v1h722n.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB6rEvxEsLP6j4TSl80IWYMPM7Zt9bncNY"
+          "current_key": "AIzaSyAcRHHqVpBAyVC9U6yDx0zTRwbyB78j09U"
         }
       ],
-      "services": {}
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1057417146171-7tbgg2ulho9falmt8qhf4ip61v1h722n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
