@@ -19,18 +19,6 @@ import 'screens/settings/settings_screen.dart';
 
 final _router = GoRouter(
   initialLocation: '/',
-  redirect: (context, state) {
-    final container = ProviderScope.containerOf(context);
-    final authState = container.read(authProvider);
-    final isAuth = authState.status == AuthStatus.authenticated;
-    final isLoading = authState.status == AuthStatus.loading;
-    final loc = state.matchedLocation;
-
-    if (isLoading) return null;
-    if (!isAuth && loc != '/login' && loc != '/onboarding') return '/login';
-    if (isAuth && loc == '/login') return '/';
-    return null;
-  },
   routes: [
     GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
     GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
@@ -67,18 +55,7 @@ class MiMichiApp extends ConsumerWidget {
     final catTheme = ref.watch(catThemeProvider);
     final themeMode = ref.watch(themeModeProvider);
 
-    ref.listen(authProvider, (previous, next) {
-      if (next.status == AuthStatus.authenticated &&
-          previous?.status != AuthStatus.authenticated) {
-        // Usuario acaba de autenticarse — cargar gatos
-        ref.read(catsProvider.notifier).init();
-        _router.go('/');
-      } else if (next.status == AuthStatus.unauthenticated) {
-        // Usuario cerró sesión — limpiar gatos y redirigir
-        ref.read(catsProvider.notifier).clear();
-        _router.go('/login');
-      }
-    });
+    // Sin auth activo — no redirigir
 
     // Redirigir al onboarding si es la primera vez
     if (showOnboarding) {
