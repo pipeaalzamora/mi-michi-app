@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "1057417146171",
+    "project_id": "proyectos-hobbys-495300",
+    "storage_bucket": ""
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057417146171:android:mimichi",
+        "android_client_info": {
+          "package_name": "com.mimichi.mi_michi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1057417146171-m546ackt09mt52q68i7hftpe02crm1nh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mimichi.mi_michi",
+            "certificate_hash": "f537732a6a32599cffe949728c3cbdcd79b3d009"
+          }
+        },
+        {
+          "client_id": "1057417146171-hcv6s2317p86dtef7va89g6q9ehrfd7q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6rEvxEsLP6j4TSl80IWYMPM7Zt9bncNY"
+        }
+      ],
+      "services": {}
+    }
+  ],
+  "configuration_version": "1"
+}
