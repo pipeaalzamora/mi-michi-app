@@ -1,41 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../models/cat.dart';
+import '../../services/cats_service.dart';
 
 const _activeCatKey = 'mi_michi_active_cat';
 const _storage = FlutterSecureStorage();
-
-// Gatos demo
-final _demoCats = [
-  Cat(
-    id: 'cat-1',
-    userId: 'demo-user',
-    name: 'Mochi',
-    birthDate: '2022-03-15',
-    breed: 'Mestizo',
-    sex: 'hembra',
-    color: 'Naranja y blanco',
-    weightKg: 4.2,
-    photoUrl: null,
-    notes: 'Le encanta dormir en el sofá.',
-    createdAt: DateTime(2022, 3, 15),
-    updatedAt: DateTime.now(),
-  ),
-  Cat(
-    id: 'cat-2',
-    userId: 'demo-user',
-    name: 'Simba',
-    birthDate: '2020-07-01',
-    breed: 'Siamés',
-    sex: 'macho',
-    color: 'Crema con puntas oscuras',
-    weightKg: 5.8,
-    photoUrl: null,
-    notes: 'Muy vocal cuando tiene hambre.',
-    createdAt: DateTime(2020, 7, 1),
-    updatedAt: DateTime.now(),
-  ),
-];
 
 class CatsState {
   final List<Cat> cats;
@@ -80,21 +49,23 @@ class CatsNotifier extends StateNotifier<CatsState> {
 
   Future<void> _init() async {
     final savedId = await _storage.read(key: _activeCatKey);
-    state = CatsState(
-      cats: _demoCats,
-      activeCatId: savedId ?? _demoCats.first.id,
-      loading: false,
-    );
+    await refresh(initialActiveCatId: savedId);
   }
 
   Future<void> init() async => _init();
 
   Future<void> refresh({String? initialActiveCatId}) async {
-    state = CatsState(
-      cats: _demoCats,
-      activeCatId: initialActiveCatId ?? state.activeCatId ?? _demoCats.first.id,
-      loading: false,
-    );
+    state = state.copyWith(loading: true, error: null);
+    try {
+      final cats = await CatsService.list();
+      String? activeId = initialActiveCatId ?? state.activeCatId;
+      if (activeId != null && !cats.any((c) => c.id == activeId)) {
+        activeId = cats.isNotEmpty ? cats.first.id : null;
+      }
+      state = CatsState(cats: cats, activeCatId: activeId, loading: false);
+    } catch (e) {
+      state = state.copyWith(loading: false, error: e.toString());
+    }
   }
 
   Future<void> setActiveCat(String id) async {
