@@ -21,8 +21,10 @@ class CatModelSelector {
     }
 
     // Por color
-    if (colorLower.contains('naranja') || colorLower.contains('orange') ||
-        colorLower.contains('rojizo') || colorLower.contains('anaranjado')) {
+    if (colorLower.contains('naranja') ||
+        colorLower.contains('orange') ||
+        colorLower.contains('rojizo') ||
+        colorLower.contains('anaranjado')) {
       return 'assets/models/gordita.glb';
     }
     if (colorLower.contains('negro') || colorLower.contains('black')) {
@@ -31,11 +33,14 @@ class CatModelSelector {
     if (colorLower.contains('blanco') || colorLower.contains('white')) {
       return 'assets/models/gordita.glb';
     }
-    if (colorLower.contains('gris') || colorLower.contains('gray') ||
-        colorLower.contains('grey') || colorLower.contains('azul')) {
+    if (colorLower.contains('gris') ||
+        colorLower.contains('gray') ||
+        colorLower.contains('grey') ||
+        colorLower.contains('azul')) {
       return 'assets/models/gordita.glb';
     }
-    if (colorLower.contains('atigrado') || colorLower.contains('tabby') ||
+    if (colorLower.contains('atigrado') ||
+        colorLower.contains('tabby') ||
         colorLower.contains('rayas')) {
       return 'assets/models/gordita.glb';
     }

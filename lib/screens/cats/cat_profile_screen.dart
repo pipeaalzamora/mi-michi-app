@@ -8,20 +8,70 @@ import '../../data/life_stages.dart';
 import '../../models/health_log.dart';
 import '../../models/vaccine.dart';
 import '../../widgets/cat_share_card.dart';
-import '../../widgets/cat_3d_viewer.dart';
+import '../../widgets/cat_avatar_visual.dart';
 import 'cat_gallery_screen.dart';
 
 // Datos demo para estadísticas
 final _demoLogs = [
-  HealthLog(id: 'h1', catId: 'cat-1', userId: 'demo-user', logType: 'peso', logDate: '2026-04-01', numericValue: 4.0, title: '4.0 kg', createdAt: DateTime(2026, 4, 1), updatedAt: DateTime(2026, 4, 1)),
-  HealthLog(id: 'h2', catId: 'cat-1', userId: 'demo-user', logType: 'peso', logDate: '2026-04-15', numericValue: 4.2, title: '4.2 kg', createdAt: DateTime(2026, 4, 15), updatedAt: DateTime(2026, 4, 15)),
-  HealthLog(id: 'h3', catId: 'cat-1', userId: 'demo-user', logType: 'visita_vet', logDate: '2026-03-10', title: 'Revisión anual', createdAt: DateTime(2026, 3, 10), updatedAt: DateTime(2026, 3, 10)),
-  HealthLog(id: 'h4', catId: 'cat-1', userId: 'demo-user', logType: 'medicamento', logDate: '2026-02-20', title: 'Antiparasitario', createdAt: DateTime(2026, 2, 20), updatedAt: DateTime(2026, 2, 20)),
+  HealthLog(
+      id: 'h1',
+      catId: 'cat-1',
+      userId: 'demo-user',
+      logType: 'peso',
+      logDate: '2026-04-01',
+      numericValue: 4.0,
+      title: '4.0 kg',
+      createdAt: DateTime(2026, 4, 1),
+      updatedAt: DateTime(2026, 4, 1)),
+  HealthLog(
+      id: 'h2',
+      catId: 'cat-1',
+      userId: 'demo-user',
+      logType: 'peso',
+      logDate: '2026-04-15',
+      numericValue: 4.2,
+      title: '4.2 kg',
+      createdAt: DateTime(2026, 4, 15),
+      updatedAt: DateTime(2026, 4, 15)),
+  HealthLog(
+      id: 'h3',
+      catId: 'cat-1',
+      userId: 'demo-user',
+      logType: 'visita_vet',
+      logDate: '2026-03-10',
+      title: 'Revisión anual',
+      createdAt: DateTime(2026, 3, 10),
+      updatedAt: DateTime(2026, 3, 10)),
+  HealthLog(
+      id: 'h4',
+      catId: 'cat-1',
+      userId: 'demo-user',
+      logType: 'medicamento',
+      logDate: '2026-02-20',
+      title: 'Antiparasitario',
+      createdAt: DateTime(2026, 2, 20),
+      updatedAt: DateTime(2026, 2, 20)),
 ];
 
 final _demoVaccines = [
-  Vaccine(id: 'v1', catId: 'cat-1', userId: 'demo-user', name: 'Trivalente felina', appliedDate: '2025-10-01', nextDueDate: '2026-10-01', createdAt: DateTime(2025, 10, 1), updatedAt: DateTime(2025, 10, 1)),
-  Vaccine(id: 'v2', catId: 'cat-1', userId: 'demo-user', name: 'Rabia', appliedDate: '2025-10-01', nextDueDate: '2026-05-15', createdAt: DateTime(2025, 10, 1), updatedAt: DateTime(2025, 10, 1)),
+  Vaccine(
+      id: 'v1',
+      catId: 'cat-1',
+      userId: 'demo-user',
+      name: 'Trivalente felina',
+      appliedDate: '2025-10-01',
+      nextDueDate: '2026-10-01',
+      createdAt: DateTime(2025, 10, 1),
+      updatedAt: DateTime(2025, 10, 1)),
+  Vaccine(
+      id: 'v2',
+      catId: 'cat-1',
+      userId: 'demo-user',
+      name: 'Rabia',
+      appliedDate: '2025-10-01',
+      nextDueDate: '2026-05-15',
+      createdAt: DateTime(2025, 10, 1),
+      updatedAt: DateTime(2025, 10, 1)),
 ];
 
 class CatProfileScreen extends ConsumerWidget {
@@ -46,7 +96,9 @@ class CatProfileScreen extends ConsumerWidget {
         .toList()
       ..sort((a, b) => b.logDate.compareTo(a.logDate));
     final daysSinceWeight = lastWeight.isNotEmpty
-        ? DateTime.now().difference(DateTime.parse(lastWeight.first.logDate)).inDays
+        ? DateTime.now()
+            .difference(DateTime.parse(lastWeight.first.logDate))
+            .inDays
         : null;
     final lastDeworming = _demoLogs
         .where((l) => l.logType == 'medicamento')
@@ -60,7 +112,8 @@ class CatProfileScreen extends ConsumerWidget {
           // Compartir
           IconButton(
             icon: const Icon(Icons.share_outlined),
-            onPressed: () => _showShareDialog(context, cat.name, shareKey, catTheme, cat),
+            onPressed: () =>
+                _showShareDialog(context, cat.name, shareKey, catTheme, cat),
           ),
           // Galería
           IconButton(
@@ -68,7 +121,8 @@ class CatProfileScreen extends ConsumerWidget {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => CatGalleryScreen(catName: cat.name, catId: catId),
+                builder: (_) =>
+                    CatGalleryScreen(catName: cat.name, catId: catId),
               ),
             ),
           ),
@@ -81,7 +135,7 @@ class CatProfileScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Hero card con modelo 3D
+          // Hero del gato
           AnimatedContainer(
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOut,
@@ -91,35 +145,35 @@ class CatProfileScreen extends ConsumerWidget {
             ),
             child: Column(
               children: [
-                // Modelo 3D
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                  child: Cat3DViewer(
-                    color: cat.color,
-                    breed: cat.breed,
-                    height: 260,
-                    autoRotate: true,
-                    showControls: true,
-                  ),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(24)),
+                  child: CatAvatarVisual(cat: cat, height: 190),
                 ),
-                // Info del gato debajo del modelo
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
                   child: Column(
                     children: [
                       Text(cat.name,
                           style: const TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white)),
-                      Text(age, style: const TextStyle(color: Colors.white70, fontSize: 15)),
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white)),
+                      Text(age,
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 15)),
                       if (stage != null) ...[
                         const SizedBox(height: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 5),
                           decoration: BoxDecoration(
-                              color: Colors.white24, borderRadius: BorderRadius.circular(20)),
+                              color: Colors.white24,
+                              borderRadius: BorderRadius.circular(20)),
                           child: Text('${stage.emoji} ${stage.label}',
                               style: const TextStyle(
-                                  color: Colors.white, fontWeight: FontWeight.w600)),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ],
@@ -143,9 +197,7 @@ class CatProfileScreen extends ConsumerWidget {
               _StatCard(
                 emoji: '⚖️',
                 label: 'Último peso',
-                value: lastWeight.isNotEmpty
-                    ? 'Hace ${daysSinceWeight}d'
-                    : '—',
+                value: lastWeight.isNotEmpty ? 'Hace ${daysSinceWeight}d' : '—',
                 color: const Color(0xFFD1FAE5),
               ),
               const SizedBox(width: 10),
@@ -169,16 +221,19 @@ class CatProfileScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Sus datos',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 12),
                   _DataRow('Sexo', cat.sex == 'desconocido' ? '—' : cat.sex),
                   _DataRow('Raza', cat.breed ?? '—'),
                   _DataRow('Color', cat.color ?? '—'),
-                  _DataRow('Peso', cat.weightKg != null ? '${cat.weightKg} kg' : '—'),
+                  _DataRow('Peso',
+                      cat.weightKg != null ? '${cat.weightKg} kg' : '—'),
                   _DataRow('Nacimiento', cat.birthDate ?? '—'),
                   if (cat.notes != null) ...[
                     const Divider(height: 20),
-                    const Text('Notas', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    const Text('Notas',
+                        style: TextStyle(fontSize: 12, color: Colors.grey)),
                     const SizedBox(height: 4),
                     Text(cat.notes!),
                   ],
@@ -207,32 +262,46 @@ class CatProfileScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(stage.label,
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF4C1D95))),
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF4C1D95))),
                           Text(stage.ageRange,
-                              style: const TextStyle(fontSize: 12, color: Color(0xFF7C3AED))),
+                              style: const TextStyle(
+                                  fontSize: 12, color: Color(0xFF7C3AED))),
                         ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Text(stage.description, style: const TextStyle(color: Color(0xFF4C1D95))),
+                  Text(stage.description,
+                      style: const TextStyle(color: Color(0xFF4C1D95))),
                   const SizedBox(height: 12),
                   const Text('Tips para esta etapa',
-                      style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF4C1D95))),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF4C1D95))),
                   const SizedBox(height: 6),
                   ...stage.tips.map((t) => Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('• ', style: TextStyle(color: AppTheme.primary)),
-                            Expanded(child: Text(t, style: const TextStyle(color: Color(0xFF4C1D95), fontSize: 13))),
+                            const Text('• ',
+                                style: TextStyle(color: AppTheme.primary)),
+                            Expanded(
+                                child: Text(t,
+                                    style: const TextStyle(
+                                        color: Color(0xFF4C1D95),
+                                        fontSize: 13))),
                           ],
                         ),
                       )),
                   const Divider(color: Color(0xFFDDD6FE), height: 20),
-                  const Text('Veterinario', style: TextStyle(fontSize: 12, color: Color(0xFF7C3AED))),
-                  Text(stage.vetVisits, style: const TextStyle(color: Color(0xFF4C1D95))),
+                  const Text('Veterinario',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF7C3AED))),
+                  Text(stage.vetVisits,
+                      style: const TextStyle(color: Color(0xFF4C1D95))),
                 ],
               ),
             ),
@@ -241,13 +310,27 @@ class CatProfileScreen extends ConsumerWidget {
           // Accesos rápidos
           Row(
             children: [
-              _ProfileAction(label: 'Salud', icon: Icons.favorite_outline, color: const Color(0xFFFFE4E6), onTap: () => context.push('/health')),
+              _ProfileAction(
+                  label: 'Salud',
+                  icon: Icons.favorite_outline,
+                  color: const Color(0xFFFFE4E6),
+                  onTap: () => context.push('/health')),
               const SizedBox(width: 12),
-              _ProfileAction(label: 'Vacunas', icon: Icons.vaccines_outlined, color: const Color(0xFFEDE9FE), onTap: () => context.push('/vaccines')),
+              _ProfileAction(
+                  label: 'Vacunas',
+                  icon: Icons.vaccines_outlined,
+                  color: const Color(0xFFEDE9FE),
+                  onTap: () => context.push('/vaccines')),
               const SizedBox(width: 12),
-              _ProfileAction(label: 'Fotos', icon: Icons.photo_library_outlined, color: const Color(0xFFD1FAE5),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => CatGalleryScreen(catName: cat.name, catId: catId)))),
+              _ProfileAction(
+                  label: 'Fotos',
+                  icon: Icons.photo_library_outlined,
+                  color: const Color(0xFFD1FAE5),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => CatGalleryScreen(
+                              catName: cat.name, catId: catId)))),
             ],
           ),
         ],
@@ -255,14 +338,18 @@ class CatProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _showShareDialog(BuildContext context, String catName, GlobalKey shareKey, catTheme, cat) {
+  void _showShareDialog(
+      BuildContext context, String catName, GlobalKey shareKey, catTheme, cat) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Compartir tarjeta'),
-        content: CatShareCard(cat: cat, catTheme: catTheme, repaintKey: shareKey),
+        content:
+            CatShareCard(cat: cat, catTheme: catTheme, repaintKey: shareKey),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
@@ -281,20 +368,29 @@ class _StatCard extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _StatCard({required this.emoji, required this.label, required this.value, required this.color});
+  const _StatCard(
+      {required this.emoji,
+      required this.label,
+      required this.value,
+      required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+            color: color, borderRadius: BorderRadius.circular(16)),
         child: Column(
           children: [
             Text(emoji, style: const TextStyle(fontSize: 20)),
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
-            Text(label, style: const TextStyle(fontSize: 10, color: Colors.black54), textAlign: TextAlign.center),
+            Text(value,
+                style:
+                    const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+            Text(label,
+                style: const TextStyle(fontSize: 10, color: Colors.black54),
+                textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -312,10 +408,18 @@ class _DataRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label, style: TextStyle(color: Colors.grey[600])),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              softWrap: true,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
         ],
       ),
     );
@@ -327,7 +431,11 @@ class _ProfileAction extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
-  const _ProfileAction({required this.label, required this.icon, required this.color, required this.onTap});
+  const _ProfileAction(
+      {required this.label,
+      required this.icon,
+      required this.color,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -336,12 +444,15 @@ class _ProfileAction extends StatelessWidget {
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(
+              color: color, borderRadius: BorderRadius.circular(16)),
           child: Column(
             children: [
               Icon(icon, size: 24),
               const SizedBox(height: 4),
-              Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 11)),
+              Text(label,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 11)),
             ],
           ),
         ),

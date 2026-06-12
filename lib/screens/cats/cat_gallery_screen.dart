@@ -3,23 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/theme/app_theme.dart';
-
-/// Modelo de foto de la galería (demo: solo locales)
-class CatPhoto {
-  final String id;
-  final String? url;      // URL remota (cuando haya backend)
-  final File? localFile;  // Archivo local recién tomado
-  final DateTime date;
-  final String? caption;
-
-  const CatPhoto({
-    required this.id,
-    this.url,
-    this.localFile,
-    required this.date,
-    this.caption,
-  });
-}
+import '../../models/cat_photo.dart';
+import '../../services/photos_service.dart';
 
 class CatGalleryScreen extends StatefulWidget {
   final String catName;
@@ -36,9 +21,39 @@ class CatGalleryScreen extends StatefulWidget {
 }
 
 class _CatGalleryScreenState extends State<CatGalleryScreen> {
-  // En demo las fotos viven en memoria
   final List<CatPhoto> _photos = [];
   final _picker = ImagePicker();
+  bool _loading = true;
+  bool _uploading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPhotos();
+  }
+
+  Future<void> _loadPhotos() async {
+    setState(() => _loading = true);
+    try {
+      final photos = await PhotosService.list(widget.catId);
+      if (mounted) {
+        setState(() {
+          _photos
+            ..clear()
+            ..addAll(photos);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(e.toString()), backgroundColor: AppTheme.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   Future<void> _addPhoto() async {
     final source = await showModalBottomSheet<ImageSource>(
@@ -69,25 +84,42 @@ class _CatGalleryScreenState extends State<CatGalleryScreen> {
     final picked = await _picker.pickImage(source: source, imageQuality: 85);
     if (picked == null) return;
 
-    setState(() {
-      _photos.insert(
-        0,
-        CatPhoto(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          localFile: File(picked.path),
-          date: DateTime.now(),
-        ),
-      );
-    });
+    setState(() => _uploading = true);
+    try {
+      final uploaded =
+          await PhotosService.upload(widget.catId, File(picked.path));
+      if (mounted) {
+        setState(() => _photos.insert(0, uploaded));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(e.toString()), backgroundColor: AppTheme.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _uploading = false);
+    }
   }
 
   void _viewPhoto(CatPhoto photo) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => _PhotoViewer(photo: photo),
+        builder: (_) => _PhotoViewer(
+          photo: photo,
+          onDelete: _deletePhoto,
+        ),
       ),
     );
+  }
+
+  Future<void> _deletePhoto(CatPhoto photo) async {
+    await PhotosService.delete(widget.catId, photo.id);
+    if (mounted) {
+      setState(() => _photos.removeWhere((p) => p.id == photo.id));
+    }
   }
 
   @override
@@ -97,74 +129,81 @@ class _CatGalleryScreenState extends State<CatGalleryScreen> {
         title: Text('Fotos de ${widget.catName}'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_a_photo_outlined),
-            onPressed: _addPhoto,
+            icon: _uploading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.add_a_photo_outlined),
+            onPressed: _uploading ? null : _addPhoto,
           ),
         ],
       ),
-      body: _photos.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('📷', style: TextStyle(fontSize: 56)),
-                  const SizedBox(height: 16),
-                  const Text('Aún no hay fotos',
-                      style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
-                  Text('Toca + para añadir la primera',
-                      style: TextStyle(color: Colors.grey[500])),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: _addPhoto,
-                    icon: const Icon(Icons.add_a_photo_outlined),
-                    label: const Text('Añadir foto'),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _photos.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('📷', style: TextStyle(fontSize: 56)),
+                      const SizedBox(height: 16),
+                      const Text('Aún no hay fotos',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 8),
+                      Text('Toca + para añadir la primera',
+                          style: TextStyle(color: Colors.grey[500])),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: _addPhoto,
+                        icon: const Icon(Icons.add_a_photo_outlined),
+                        label: const Text('Añadir foto'),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )
-          : GridView.builder(
-              padding: const EdgeInsets.all(12),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: _photos.length,
-              itemBuilder: (_, i) {
-                final photo = _photos[i];
-                return GestureDetector(
-                  onTap: () => _viewPhoto(photo),
-                  child: Hero(
-                    tag: photo.id,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: photo.localFile != null
-                          ? Image.file(photo.localFile!, fit: BoxFit.cover)
-                          : CachedNetworkImage(
-                              imageUrl: photo.url!,
-                              fit: BoxFit.cover,
-                              placeholder: (_, __) => Container(
-                                color: Colors.grey[200],
-                                child: const Center(
-                                    child: CircularProgressIndicator()),
-                              ),
-                              errorWidget: (_, __, ___) =>
-                                  const Icon(Icons.broken_image),
+                )
+              : GridView.builder(
+                  padding: const EdgeInsets.all(12),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: _photos.length,
+                  itemBuilder: (_, i) {
+                    final photo = _photos[i];
+                    return GestureDetector(
+                      onTap: () => _viewPhoto(photo),
+                      child: Hero(
+                        tag: photo.id,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: CachedNetworkImage(
+                            imageUrl: photo.photoUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (_, __) => Container(
+                              color: Colors.grey[200],
+                              child: const Center(
+                                  child: CircularProgressIndicator()),
                             ),
-                    ),
-                  ),
-                );
-              },
-            ),
+                            errorWidget: (_, __, ___) =>
+                                const Icon(Icons.broken_image),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }
 
 class _PhotoViewer extends StatelessWidget {
   final CatPhoto photo;
-  const _PhotoViewer({required this.photo});
+  final Future<void> Function(CatPhoto photo) onDelete;
+  const _PhotoViewer({required this.photo, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -174,20 +213,45 @@ class _PhotoViewer extends StatelessWidget {
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         title: Text(
-          _formatDate(photo.date),
+          _formatDate(photo.createdAt),
           style: const TextStyle(fontSize: 14, color: Colors.white70),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text('Eliminar foto'),
+                  content: const Text('¿Quieres eliminar esta foto?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Eliminar'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm != true) return;
+              await onDelete(photo);
+              if (context.mounted) Navigator.pop(context);
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Hero(
           tag: photo.id,
           child: InteractiveViewer(
-            child: photo.localFile != null
-                ? Image.file(photo.localFile!)
-                : CachedNetworkImage(
-                    imageUrl: photo.url!,
-                    fit: BoxFit.contain,
-                  ),
+            child: CachedNetworkImage(
+              imageUrl: photo.photoUrl,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
       ),

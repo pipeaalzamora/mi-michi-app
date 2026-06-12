@@ -25,7 +25,8 @@ class LifeStages {
       label: 'Cachorro',
       emoji: '🐾',
       ageRange: '0 a 6 meses',
-      description: 'Etapa de descubrimiento. Tu michi crece muy rápido, juega sin parar y aprende del mundo.',
+      description:
+          'Etapa de descubrimiento. Tu michi crece muy rápido, juega sin parar y aprende del mundo.',
       tips: [
         'Alimento específico para gatitos (kitten), rico en proteínas y grasas.',
         'Socialízalo con personas, ruidos y juguetes desde temprano.',
@@ -38,7 +39,8 @@ class LifeStages {
       label: 'Juvenil',
       emoji: '✨',
       ageRange: '6 a 12 meses',
-      description: 'Tu gato es un adolescente: muy enérgico, curioso y un poco travieso.',
+      description:
+          'Tu gato es un adolescente: muy enérgico, curioso y un poco travieso.',
       tips: [
         'Considera la esterilización entre los 5 y 8 meses.',
         'Transición gradual a alimento de adulto al cumplir el año.',
@@ -51,7 +53,8 @@ class LifeStages {
       label: 'Adulto joven',
       emoji: '😺',
       ageRange: '1 a 6 años',
-      description: 'Tu michi está en su mejor momento: activo, sano y con personalidad bien definida.',
+      description:
+          'Tu michi está en su mejor momento: activo, sano y con personalidad bien definida.',
       tips: [
         'Alimento balanceado de adulto, controlando porciones.',
         'Mantén las vacunas anuales y desparasitación al día.',
@@ -64,7 +67,8 @@ class LifeStages {
       label: 'Adulto maduro',
       emoji: '🐈',
       ageRange: '7 a 10 años',
-      description: 'Tu gato empieza a bajar el ritmo. Es momento de prestar más atención a su salud.',
+      description:
+          'Tu gato empieza a bajar el ritmo. Es momento de prestar más atención a su salud.',
       tips: [
         'Considera alimento senior o de madurez.',
         'Revisiones veterinarias cada 6 meses.',
@@ -77,7 +81,8 @@ class LifeStages {
       label: 'Senior',
       emoji: '👴🐱',
       ageRange: '11+ años',
-      description: 'Tu michi es un veterano. Merece cuidados especiales y mucho amor.',
+      description:
+          'Tu michi es un veterano. Merece cuidados especiales y mucho amor.',
       tips: [
         'Alimento específico para gatos senior.',
         'Análisis de sangre anuales para detectar problemas a tiempo.',
@@ -105,7 +110,12 @@ class LifeStages {
     final birth = DateTime.tryParse(birthDate);
     if (birth == null) return 'Edad desconocida';
     final now = DateTime.now();
-    final years = now.year - birth.year - (now.month < birth.month || (now.month == birth.month && now.day < birth.day) ? 1 : 0);
+    final years = now.year -
+        birth.year -
+        (now.month < birth.month ||
+                (now.month == birth.month && now.day < birth.day)
+            ? 1
+            : 0);
     final months = now.difference(birth).inDays ~/ 30;
     if (years >= 1) return '$years ${years == 1 ? 'año' : 'años'}';
     return '$months ${months == 1 ? 'mes' : 'meses'}';

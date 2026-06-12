@@ -38,7 +38,6 @@ class CatsService {
     String sex = 'desconocido',
     String? color,
     double? weightKg,
-    String? photoUrl,
     String? notes,
   }) async {
     final res = await ApiClient.dio.put('/api/cats/$id', data: {
@@ -48,7 +47,6 @@ class CatsService {
       'sex': sex,
       'color': color,
       'weight_kg': weightKg,
-      'photo_url': photoUrl,
       'notes': notes,
     });
     return Cat.fromJson(res.data);

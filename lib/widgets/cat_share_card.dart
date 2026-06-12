@@ -80,8 +80,7 @@ class CatShareCard extends StatelessWidget {
             // Datos
             _InfoRow('Raza', cat.breed ?? '—'),
             _InfoRow('Sexo', cat.sex == 'desconocido' ? '—' : cat.sex),
-            if (cat.weightKg != null)
-              _InfoRow('Peso', '${cat.weightKg} kg'),
+            if (cat.weightKg != null) _InfoRow('Peso', '${cat.weightKg} kg'),
             const SizedBox(height: 12),
             const Text('Mi Michi 🐾',
                 style: TextStyle(color: Colors.white54, fontSize: 11)),
@@ -120,8 +119,8 @@ class _InfoRow extends StatelessWidget {
 /// Captura el widget y lo comparte como imagen PNG.
 Future<void> shareCatCard(GlobalKey repaintKey, String catName) async {
   try {
-    final boundary = repaintKey.currentContext?.findRenderObject()
-        as RenderRepaintBoundary?;
+    final boundary =
+        repaintKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     if (boundary == null) return;
 
     final image = await boundary.toImage(pixelRatio: 3.0);

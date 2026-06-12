@@ -34,15 +34,29 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
   Future<void> _fetch() async {
     final catId = ref.read(catsProvider).activeCat?.id;
     if (catId == null) {
-      setState(() { _logs = []; _loading = false; });
+      setState(() {
+        _logs = [];
+        _loading = false;
+      });
       return;
     }
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final logs = await HealthService.list(catId);
-      if (mounted) setState(() { _logs = logs; _loading = false; });
+      if (mounted)
+        setState(() {
+          _logs = logs;
+          _loading = false;
+        });
     } catch (e) {
-      if (mounted) setState(() { _error = e.toString(); _loading = false; });
+      if (mounted)
+        setState(() {
+          _error = e.toString();
+          _loading = false;
+        });
     }
   }
 
@@ -67,10 +81,13 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
         title: const Text('Eliminar registro'),
         content: const Text('¿Seguro que quieres eliminar este registro?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Eliminar', style: TextStyle(color: AppTheme.error)),
+            child:
+                const Text('Eliminar', style: TextStyle(color: AppTheme.error)),
           ),
         ],
       ),
@@ -82,7 +99,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppTheme.error),
+          SnackBar(
+              content: Text(e.toString()), backgroundColor: AppTheme.error),
         );
       }
     }
@@ -115,9 +133,11 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                     children: [
                       const Text('😿', style: TextStyle(fontSize: 48)),
                       const SizedBox(height: 12),
-                      Text('Error al cargar', style: TextStyle(color: Colors.grey[600])),
+                      Text('Error al cargar',
+                          style: TextStyle(color: Colors.grey[600])),
                       const SizedBox(height: 8),
-                      ElevatedButton(onPressed: _fetch, child: const Text('Reintentar')),
+                      ElevatedButton(
+                          onPressed: _fetch, child: const Text('Reintentar')),
                     ],
                   ),
                 )
@@ -132,7 +152,9 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                         children: [
                           _StatCard(
                             label: 'Último peso',
-                            value: lastWeight != null ? '${lastWeight.numericValue} kg' : '—',
+                            value: lastWeight != null
+                                ? '${lastWeight.numericValue} kg'
+                                : '—',
                             color: const Color(0xFFD1FAE5),
                           ),
                           const SizedBox(width: 12),
@@ -148,7 +170,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                       // Gráfico de peso
                       if (weightPoints.length >= 2) ...[
                         const Text('Evolución de peso',
-                            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 16)),
                         const SizedBox(height: 8),
                         SizedBox(
                           height: 160,
@@ -159,8 +182,11 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                               borderData: FlBorderData(show: false),
                               lineBarsData: [
                                 LineChartBarData(
-                                  spots: weightPoints.asMap().entries
-                                      .map((e) => FlSpot(e.key.toDouble(), e.value.numericValue!))
+                                  spots: weightPoints
+                                      .asMap()
+                                      .entries
+                                      .map((e) => FlSpot(e.key.toDouble(),
+                                          e.value.numericValue!))
                                       .toList(),
                                   isCurved: true,
                                   color: primary,
@@ -180,7 +206,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
 
                       // Historial
                       const Text('Historial',
-                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 16)),
                       const SizedBox(height: 8),
                       if (_logs.isEmpty)
                         Center(
@@ -188,13 +215,15 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                             padding: const EdgeInsets.all(32),
                             child: Column(
                               children: [
-                                const Text('📋', style: TextStyle(fontSize: 40)),
+                                const Text('📋',
+                                    style: TextStyle(fontSize: 40)),
                                 const SizedBox(height: 8),
                                 Text('Aún no hay registros.',
                                     style: TextStyle(color: Colors.grey[500])),
                                 const SizedBox(height: 4),
                                 Text('Toca + para añadir el primero.',
-                                    style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+                                    style: TextStyle(
+                                        color: Colors.grey[400], fontSize: 12)),
                               ],
                             ),
                           ),
@@ -216,20 +245,25 @@ class _StatCard extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _StatCard({required this.label, required this.value, required this.color});
+  const _StatCard(
+      {required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+            color: color, borderRadius: BorderRadius.circular(16)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+            Text(label,
+                style: TextStyle(fontSize: 12, color: Colors.grey[700])),
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+            Text(value,
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
           ],
         ),
       ),
@@ -241,24 +275,30 @@ class _LogCard extends StatelessWidget {
   final HealthLog log;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
-  const _LogCard({required this.log, required this.onEdit, required this.onDelete});
+  const _LogCard(
+      {required this.log, required this.onEdit, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
-    final meta = logMetaMap[log.logType] ?? const LogMeta(label: 'Otro', emoji: '📝');
+    final meta =
+        logMetaMap[log.logType] ?? const LogMeta(label: 'Otro', emoji: '📝');
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
         leading: Text(meta.emoji, style: const TextStyle(fontSize: 24)),
-        title: Text(log.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        title: Text(log.title,
+            style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Text('${meta.label} · ${log.logDate}',
             style: TextStyle(fontSize: 12, color: Colors.grey[500])),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(icon: const Icon(Icons.edit_outlined, size: 18), onPressed: onEdit),
             IconButton(
-                icon: const Icon(Icons.delete_outline, size: 18, color: AppTheme.error),
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                onPressed: onEdit),
+            IconButton(
+                icon: const Icon(Icons.delete_outline,
+                    size: 18, color: AppTheme.error),
                 onPressed: onDelete),
           ],
         ),
@@ -322,7 +362,8 @@ class _LogFormState extends ConsumerState<_LogForm> {
           logDate: _logDate,
           title: title,
           numericValue: double.tryParse(_numCtrl.text),
-          description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+          description:
+              _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
         );
       } else {
         await HealthService.update(
@@ -332,7 +373,8 @@ class _LogFormState extends ConsumerState<_LogForm> {
           logDate: _logDate,
           title: title,
           numericValue: double.tryParse(_numCtrl.text),
-          description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+          description:
+              _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
         );
       }
       widget.onSaved();
@@ -340,7 +382,8 @@ class _LogFormState extends ConsumerState<_LogForm> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppTheme.error),
+          SnackBar(
+              content: Text(e.toString()), backgroundColor: AppTheme.error),
         );
       }
     } finally {
@@ -351,20 +394,23 @@ class _LogFormState extends ConsumerState<_LogForm> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+      padding: EdgeInsets.fromLTRB(
+          16, 16, 16, MediaQuery.of(context).viewInsets.bottom + 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(widget.editing == null ? 'Nuevo registro' : 'Editar registro',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              style:
+                  const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
             value: _logType,
             decoration: const InputDecoration(labelText: 'Tipo'),
             items: logMetaMap.entries
                 .map((e) => DropdownMenuItem(
-                    value: e.key, child: Text('${e.value.emoji} ${e.value.label}')))
+                    value: e.key,
+                    child: Text('${e.value.emoji} ${e.value.label}')))
                 .toList(),
             onChanged: (v) => setState(() => _logType = v!),
           ),
@@ -372,8 +418,10 @@ class _LogFormState extends ConsumerState<_LogForm> {
           if (_logType == 'peso')
             TextField(
               controller: _numCtrl,
-              decoration: const InputDecoration(labelText: 'Peso (kg)', suffixText: 'kg'),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(
+                  labelText: 'Peso (kg)', suffixText: 'kg'),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
             )
           else
             TextField(
@@ -393,8 +441,10 @@ class _LogFormState extends ConsumerState<_LogForm> {
               onPressed: _saving ? null : _save,
               child: _saving
                   ? const SizedBox(
-                      height: 20, width: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
                   : const Text('Guardar'),
             ),
           ),

@@ -4,14 +4,24 @@ import '../core/api/api_client.dart';
 import '../models/user_profile.dart';
 
 class AuthService {
+  static const _devAuth = String.fromEnvironment('APP_AUTH_MODE') == 'dev';
+  static const _devUser = UserProfile(
+    id: 'dev-user-001',
+    email: 'dev@mimichi.local',
+    displayName: 'Modo diseño',
+    picture: '',
+  );
+
   static final _firebaseAuth = FirebaseAuth.instance;
   static final _googleSignIn = GoogleSignIn(
     serverClientId:
-        '1057417146171-7tbgg2ulho9falmt8qhf4ip61v1h722n.apps.googleusercontent.com',
+        '1057417146171-kmie6i3dh6giduvuopejeqi2nsqh76de.apps.googleusercontent.com',
     scopes: ['openid', 'email', 'profile'],
   );
 
   static Future<UserProfile> signInWithGoogle() async {
+    if (_devAuth) return _devUser;
+
     await _googleSignIn.signOut();
 
     GoogleSignInAccount? googleUser;
@@ -57,6 +67,8 @@ class AuthService {
   }
 
   static Future<UserProfile?> currentUserProfile() async {
+    if (_devAuth) return _devUser;
+
     final user = _firebaseAuth.currentUser;
     if (user == null) return null;
 
@@ -77,6 +89,8 @@ class AuthService {
   }
 
   static Future<void> signOut() async {
+    if (_devAuth) return;
+
     await Future.wait([
       _googleSignIn.signOut(),
       _firebaseAuth.signOut(),
@@ -85,6 +99,8 @@ class AuthService {
   }
 
   static Future<bool> isLoggedIn() async {
+    if (_devAuth) return true;
+
     return _firebaseAuth.currentUser != null;
   }
 }

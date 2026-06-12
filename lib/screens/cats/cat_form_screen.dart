@@ -8,6 +8,7 @@ import '../../core/theme/app_theme.dart';
 import '../../models/cat.dart';
 import '../../data/cat_breeds.dart';
 import '../../services/cats_service.dart';
+import '../../services/integrations_service.dart';
 
 class CatFormScreen extends ConsumerStatefulWidget {
   final String? catId;
@@ -31,6 +32,8 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
   File? _localPhoto;
   bool _saving = false;
   bool _uploading = false;
+  bool _loadingBreeds = false;
+  List<String> _breedOptions = catBreeds;
 
   Cat? get _existing {
     if (widget.catId == null) return null;
@@ -54,6 +57,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
       _birthDate = cat.birthDate;
       _photoUrl = cat.photoUrl;
     }
+    _loadBreeds();
   }
 
   @override
@@ -68,9 +72,30 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
 
   Future<void> _pickPhoto() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final picked =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (picked == null) return;
     setState(() => _localPhoto = File(picked.path));
+  }
+
+  Future<void> _loadBreeds() async {
+    setState(() => _loadingBreeds = true);
+    try {
+      final breeds = await IntegrationsService.catBreeds();
+      final names = breeds
+          .map((breed) => breed.name)
+          .where((name) => name.trim().isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort();
+      if (mounted && names.isNotEmpty) {
+        setState(() => _breedOptions = names);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _breedOptions = catBreeds);
+    } finally {
+      if (mounted) setState(() => _loadingBreeds = false);
+    }
   }
 
   Future<void> _save() async {
@@ -97,7 +122,6 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
           sex: _sex,
           color: _colorCtrl.text.trim().isEmpty ? null : _colorCtrl.text.trim(),
           weightKg: double.tryParse(_weightCtrl.text),
-          photoUrl: _photoUrl,
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );
       }
@@ -117,11 +141,17 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppTheme.error),
+          SnackBar(
+              content: Text(e.toString()), backgroundColor: AppTheme.error),
         );
       }
     } finally {
-      if (mounted) setState(() { _saving = false; _uploading = false; });
+      if (mounted) {
+        setState(() {
+          _saving = false;
+          _uploading = false;
+        });
+      }
     }
   }
 
@@ -132,10 +162,13 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
         title: const Text('Eliminar perfil'),
         content: const Text('¿Seguro que quieres eliminar este perfil?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Eliminar', style: TextStyle(color: AppTheme.error)),
+            child:
+                const Text('Eliminar', style: TextStyle(color: AppTheme.error)),
           ),
         ],
       ),
@@ -148,7 +181,8 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppTheme.error),
+          SnackBar(
+              content: Text(e.toString()), backgroundColor: AppTheme.error),
         );
       }
     }
@@ -185,9 +219,12 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                       backgroundColor: AppTheme.primary.withOpacity(0.15),
                       backgroundImage: _localPhoto != null
                           ? FileImage(_localPhoto!)
-                          : (_photoUrl != null ? NetworkImage(_photoUrl!) as ImageProvider : null),
+                          : (_photoUrl != null
+                              ? NetworkImage(_photoUrl!) as ImageProvider
+                              : null),
                       child: (_localPhoto == null && _photoUrl == null)
-                          ? const Icon(Icons.camera_alt, size: 32, color: AppTheme.primary)
+                          ? const Icon(Icons.camera_alt,
+                              size: 32, color: AppTheme.primary)
                           : null,
                     ),
                     Positioned(
@@ -199,7 +236,8 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                           color: AppTheme.primary,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.edit, size: 14, color: Colors.white),
+                        child: const Icon(Icons.edit,
+                            size: 14, color: Colors.white),
                       ),
                     ),
                   ],
@@ -212,7 +250,9 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
             TextFormField(
               controller: _nameCtrl,
               decoration: const InputDecoration(labelText: 'Nombre *'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'El nombre es obligatorio' : null,
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'El nombre es obligatorio'
+                  : null,
             ),
             const SizedBox(height: 12),
 
@@ -228,7 +268,8 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                   lastDate: DateTime.now(),
                 );
                 if (picked != null) {
-                  setState(() => _birthDate = picked.toIso8601String().split('T').first);
+                  setState(() =>
+                      _birthDate = picked.toIso8601String().split('T').first);
                 }
               },
               child: AbsorbPointer(
@@ -259,8 +300,10 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
             // Peso
             TextFormField(
               controller: _weightCtrl,
-              decoration: const InputDecoration(labelText: 'Peso (kg)', suffixText: 'kg'),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(
+                  labelText: 'Peso (kg)', suffixText: 'kg'),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
             ),
             const SizedBox(height: 12),
 
@@ -268,8 +311,8 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
             Autocomplete<String>(
               initialValue: TextEditingValue(text: _breedCtrl.text),
               optionsBuilder: (textEditingValue) {
-                if (textEditingValue.text.isEmpty) return catBreeds;
-                return catBreeds.where((b) => b
+                if (textEditingValue.text.isEmpty) return _breedOptions;
+                return _breedOptions.where((b) => b
                     .toLowerCase()
                     .contains(textEditingValue.text.toLowerCase()));
               },
@@ -282,7 +325,19 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                 return TextFormField(
                   controller: controller,
                   focusNode: focusNode,
-                  decoration: const InputDecoration(labelText: 'Raza'),
+                  decoration: InputDecoration(
+                    labelText: 'Raza',
+                    suffixIcon: _loadingBreeds
+                        ? const Padding(
+                            padding: EdgeInsets.all(14),
+                            child: SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : null,
+                  ),
                   onChanged: (v) => _breedCtrl.text = v,
                 );
               },
@@ -293,7 +348,8 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                     elevation: 4,
                     borderRadius: BorderRadius.circular(12),
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 200, maxWidth: 300),
+                      constraints:
+                          const BoxConstraints(maxHeight: 200, maxWidth: 300),
                       child: ListView.builder(
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
@@ -335,7 +391,8 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2),
                     )
                   : Text(isNew ? 'Añadir gatito' : 'Guardar cambios'),
             ),

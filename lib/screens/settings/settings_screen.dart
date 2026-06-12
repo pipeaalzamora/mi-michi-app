@@ -29,7 +29,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _saveName() async {
     if (_nameCtrl.text.trim().isEmpty) return;
-    await ref.read(authProvider.notifier).updateDisplayName(_nameCtrl.text.trim());
+    await ref
+        .read(authProvider.notifier)
+        .updateDisplayName(_nameCtrl.text.trim());
     setState(() => _editingName = false);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,7 +59,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Tu cuenta',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -74,7 +77,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(user?.email ?? '',
-                            style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                            style: TextStyle(
+                                color: Colors.grey[600], fontSize: 13)),
                       ),
                     ],
                   ),
@@ -89,12 +93,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           child: TextField(
                             controller: _nameCtrl,
                             autofocus: true,
-                            decoration: const InputDecoration(hintText: 'Tu nombre', isDense: true),
+                            decoration: const InputDecoration(
+                                hintText: 'Tu nombre', isDense: true),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        IconButton(icon: Icon(Icons.check, color: primary), onPressed: _saveName),
-                        IconButton(icon: const Icon(Icons.close), onPressed: () => setState(() => _editingName = false)),
+                        IconButton(
+                            icon: Icon(Icons.check, color: primary),
+                            onPressed: _saveName),
+                        IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () =>
+                                setState(() => _editingName = false)),
                       ],
                     )
                   else
@@ -102,8 +112,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            user?.displayName.isNotEmpty == true ? user!.displayName : 'Sin nombre',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            user?.displayName.isNotEmpty == true
+                                ? user!.displayName
+                                : 'Sin nombre',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                         ),
                         IconButton(
@@ -126,7 +139,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Apariencia',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -135,7 +149,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         label: 'Claro',
                         selected: themeMode == ThemeMode.light,
                         primary: primary,
-                        onTap: () => ref.read(themeModeProvider.notifier).setMode(ThemeMode.light),
+                        onTap: () => ref
+                            .read(themeModeProvider.notifier)
+                            .setMode(ThemeMode.light),
                       ),
                       const SizedBox(width: 10),
                       _ThemeOption(
@@ -143,7 +159,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         label: 'Oscuro',
                         selected: themeMode == ThemeMode.dark,
                         primary: primary,
-                        onTap: () => ref.read(themeModeProvider.notifier).setMode(ThemeMode.dark),
+                        onTap: () => ref
+                            .read(themeModeProvider.notifier)
+                            .setMode(ThemeMode.dark),
                       ),
                       const SizedBox(width: 10),
                       _ThemeOption(
@@ -151,7 +169,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         label: 'Sistema',
                         selected: themeMode == ThemeMode.system,
                         primary: primary,
-                        onTap: () => ref.read(themeModeProvider.notifier).setMode(ThemeMode.system),
+                        onTap: () => ref
+                            .read(themeModeProvider.notifier)
+                            .setMode(ThemeMode.system),
                       ),
                     ],
                   ),
@@ -176,11 +196,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: OutlinedButton.icon(
               onPressed: () => ref.read(authProvider.notifier).signOut(),
               icon: const Icon(Icons.logout, color: Color(0xFFEF4444)),
-              label: const Text('Cerrar sesión', style: TextStyle(color: Color(0xFFEF4444))),
+              label: const Text('Cerrar sesión',
+                  style: TextStyle(color: Color(0xFFEF4444))),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0x66EF4444)),
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
               ),
             ),
           ),
@@ -214,7 +236,8 @@ class _ThemeOption extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: selected ? primary.withValues(alpha: 0.12) : Colors.grey[100],
+            color:
+                selected ? primary.withValues(alpha: 0.12) : Colors.grey[100],
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: selected ? primary : Colors.transparent,
@@ -223,7 +246,8 @@ class _ThemeOption extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Icon(icon, color: selected ? primary : Colors.grey[500], size: 22),
+              Icon(icon,
+                  color: selected ? primary : Colors.grey[500], size: 22),
               const SizedBox(height: 4),
               Text(label,
                   style: TextStyle(

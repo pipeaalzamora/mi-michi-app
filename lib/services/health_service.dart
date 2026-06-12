@@ -34,7 +34,8 @@ class HealthService {
     double? numericValue,
     String? description,
   }) async {
-    final res = await ApiClient.dio.put('/api/cats/$catId/health/$logId', data: {
+    final res =
+        await ApiClient.dio.put('/api/cats/$catId/health/$logId', data: {
       'log_type': logType,
       'log_date': logDate,
       'title': title,

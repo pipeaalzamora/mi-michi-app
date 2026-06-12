@@ -28,6 +28,11 @@ class _CatsListScreenState extends ConsumerState<CatsListScreen> {
         title: const Text('Mis gatos'),
         actions: [
           IconButton(
+            tooltip: 'Adopciones',
+            icon: const Icon(Icons.volunteer_activism_outlined),
+            onPressed: () => context.push('/adoptions'),
+          ),
+          IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
               await context.push('/cats/new');
@@ -52,7 +57,8 @@ class _CatsListScreenState extends ConsumerState<CatsListScreen> {
           const SizedBox(height: 8),
           Expanded(
             child: catsState.loading
-                ? const Center(child: CircularProgressIndicator(color: AppTheme.primary))
+                ? const Center(
+                    child: CircularProgressIndicator(color: AppTheme.primary))
                 : filtered.isEmpty
                     ? Center(
                         child: Column(
@@ -99,9 +105,8 @@ class _CatCard extends ConsumerWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: isActive
-              ? Border.all(color: AppTheme.primary, width: 2)
-              : null,
+          border:
+              isActive ? Border.all(color: AppTheme.primary, width: 2) : null,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),

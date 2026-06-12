@@ -38,15 +38,29 @@ class _VaccinesScreenState extends ConsumerState<VaccinesScreen> {
   Future<void> _fetch() async {
     final catId = ref.read(catsProvider).activeCat?.id;
     if (catId == null) {
-      setState(() { _vaccines = []; _loading = false; });
+      setState(() {
+        _vaccines = [];
+        _loading = false;
+      });
       return;
     }
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final vaccines = await VaccinesService.list(catId);
-      if (mounted) setState(() { _vaccines = vaccines; _loading = false; });
+      if (mounted)
+        setState(() {
+          _vaccines = vaccines;
+          _loading = false;
+        });
     } catch (e) {
-      if (mounted) setState(() { _error = e.toString(); _loading = false; });
+      if (mounted)
+        setState(() {
+          _error = e.toString();
+          _loading = false;
+        });
     }
   }
 
@@ -76,10 +90,13 @@ class _VaccinesScreenState extends ConsumerState<VaccinesScreen> {
         title: const Text('Eliminar vacuna'),
         content: const Text('¿Seguro que quieres eliminar este registro?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Eliminar', style: TextStyle(color: AppTheme.error)),
+            child:
+                const Text('Eliminar', style: TextStyle(color: AppTheme.error)),
           ),
         ],
       ),
@@ -91,7 +108,8 @@ class _VaccinesScreenState extends ConsumerState<VaccinesScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppTheme.error),
+          SnackBar(
+              content: Text(e.toString()), backgroundColor: AppTheme.error),
         );
       }
     }
@@ -107,7 +125,9 @@ class _VaccinesScreenState extends ConsumerState<VaccinesScreen> {
         ],
       ),
       body: _loading
-          ? Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary))
+          ? Center(
+              child: CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary))
           : _error != null
               ? Center(
                   child: Column(
@@ -115,58 +135,64 @@ class _VaccinesScreenState extends ConsumerState<VaccinesScreen> {
                     children: [
                       const Text('😿', style: TextStyle(fontSize: 48)),
                       const SizedBox(height: 12),
-                      Text('Error al cargar', style: TextStyle(color: Colors.grey[600])),
+                      Text('Error al cargar',
+                          style: TextStyle(color: Colors.grey[600])),
                       const SizedBox(height: 8),
-                      ElevatedButton(onPressed: _fetch, child: const Text('Reintentar')),
+                      ElevatedButton(
+                          onPressed: _fetch, child: const Text('Reintentar')),
                     ],
                   ),
                 )
               : RefreshIndicator(
                   color: Theme.of(context).colorScheme.primary,
                   onRefresh: _fetch,
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  // Mis registros
-                  const Text('Mis registros',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                  const SizedBox(height: 8),
-                  if (_vaccines.isEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey[200]!),
-                      ),
-                      child: Center(
-                        child: Text('Aún no has registrado vacunas.',
-                            style: TextStyle(color: Colors.grey[500])),
-                      ),
-                    )
-                  else
-                    ...(_vaccines.map((v) => _VaccineCard(
-                          vaccine: v,
-                          onEdit: () => _openForm(editing: v),
-                          onDelete: () => _delete(v),
-                        ))),
-                  const SizedBox(height: 24),
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      // Mis registros
+                      const Text('Mis registros',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 16)),
+                      const SizedBox(height: 8),
+                      if (_vaccines.isEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[50],
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.grey[200]!),
+                          ),
+                          child: Center(
+                            child: Text('Aún no has registrado vacunas.',
+                                style: TextStyle(color: Colors.grey[500])),
+                          ),
+                        )
+                      else
+                        ...(_vaccines.map((v) => _VaccineCard(
+                              vaccine: v,
+                              onEdit: () => _openForm(editing: v),
+                              onDelete: () => _delete(v),
+                            ))),
+                      const SizedBox(height: 24),
 
-                  // Calendario sugerido
-                  const Text('Calendario sugerido',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                  const SizedBox(height: 4),
-                  Text('Referencia general — confirma con tu veterinario.',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-                  const SizedBox(height: 8),
-                  ...(_suggestedVaccines.map((sv) => _SuggestedCard(
-                        name: sv['name']!,
-                        importance: sv['importance']!,
-                        onRegister: () => _openForm(suggestedName: sv['name']),
-                      ))),
-                ],
-              ),
-            ),
+                      // Calendario sugerido
+                      const Text('Calendario sugerido',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 16)),
+                      const SizedBox(height: 4),
+                      Text('Referencia general — confirma con tu veterinario.',
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.grey[500])),
+                      const SizedBox(height: 8),
+                      ...(_suggestedVaccines.map((sv) => _SuggestedCard(
+                            name: sv['name']!,
+                            importance: sv['importance']!,
+                            onRegister: () =>
+                                _openForm(suggestedName: sv['name']),
+                          ))),
+                    ],
+                  ),
+                ),
     );
   }
 }
@@ -175,7 +201,8 @@ class _VaccineCard extends StatelessWidget {
   final Vaccine vaccine;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
-  const _VaccineCard({required this.vaccine, required this.onEdit, required this.onDelete});
+  const _VaccineCard(
+      {required this.vaccine, required this.onEdit, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -183,9 +210,16 @@ class _VaccineCard extends StatelessWidget {
     Color? badgeColor;
     String? badgeText;
     if (days != null) {
-      if (days < 0) { badgeColor = AppTheme.error; badgeText = 'Vencida'; }
-      else if (days <= 30) { badgeColor = AppTheme.warning; badgeText = 'En $days días'; }
-      else { badgeColor = const Color(0xFF059669); badgeText = 'En $days días'; }
+      if (days < 0) {
+        badgeColor = AppTheme.error;
+        badgeText = 'Vencida';
+      } else if (days <= 30) {
+        badgeColor = AppTheme.warning;
+        badgeText = 'En $days días';
+      } else {
+        badgeColor = const Color(0xFF059669);
+        badgeText = 'En $days días';
+      }
     }
 
     return Card(
@@ -199,11 +233,15 @@ class _VaccineCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(vaccine.name,
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 15)),
                 ),
-                IconButton(icon: const Icon(Icons.edit_outlined, size: 18), onPressed: onEdit),
                 IconButton(
-                    icon: const Icon(Icons.delete_outline, size: 18, color: AppTheme.error),
+                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    onPressed: onEdit),
+                IconButton(
+                    icon: const Icon(Icons.delete_outline,
+                        size: 18, color: AppTheme.error),
                     onPressed: onDelete),
               ],
             ),
@@ -215,14 +253,17 @@ class _VaccineCard extends StatelessWidget {
             if (badgeText != null) ...[
               const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: badgeColor!.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text('Próxima: $badgeText',
                     style: TextStyle(
-                        color: badgeColor, fontSize: 12, fontWeight: FontWeight.w600)),
+                        color: badgeColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600)),
               ),
             ],
           ],
@@ -236,7 +277,8 @@ class _SuggestedCard extends StatelessWidget {
   final String name;
   final String importance;
   final VoidCallback onRegister;
-  const _SuggestedCard({required this.name, required this.importance, required this.onRegister});
+  const _SuggestedCard(
+      {required this.name, required this.importance, required this.onRegister});
 
   @override
   Widget build(BuildContext context) {
@@ -251,10 +293,12 @@ class _SuggestedCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(name,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: isEssential
                           ? AppTheme.error.withOpacity(0.1)
@@ -265,7 +309,8 @@ class _SuggestedCard extends StatelessWidget {
                       importance,
                       style: TextStyle(
                           fontSize: 11,
-                          color: isEssential ? AppTheme.error : AppTheme.primary,
+                          color:
+                              isEssential ? AppTheme.error : AppTheme.primary,
                           fontWeight: FontWeight.w600),
                     ),
                   ),
@@ -288,7 +333,11 @@ class _VaccineForm extends ConsumerStatefulWidget {
   final Vaccine? editing;
   final String? suggestedName;
   final VoidCallback onSaved;
-  const _VaccineForm({required this.catId, this.editing, this.suggestedName, required this.onSaved});
+  const _VaccineForm(
+      {required this.catId,
+      this.editing,
+      this.suggestedName,
+      required this.onSaved});
 
   @override
   ConsumerState<_VaccineForm> createState() => _VaccineFormState();
@@ -335,7 +384,8 @@ class _VaccineFormState extends ConsumerState<_VaccineForm> {
           name: _nameCtrl.text.trim(),
           appliedDate: _appliedDate,
           nextDueDate: _nextDueDate,
-          veterinarian: _vetCtrl.text.trim().isEmpty ? null : _vetCtrl.text.trim(),
+          veterinarian:
+              _vetCtrl.text.trim().isEmpty ? null : _vetCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );
       } else {
@@ -345,7 +395,8 @@ class _VaccineFormState extends ConsumerState<_VaccineForm> {
           name: _nameCtrl.text.trim(),
           appliedDate: _appliedDate,
           nextDueDate: _nextDueDate,
-          veterinarian: _vetCtrl.text.trim().isEmpty ? null : _vetCtrl.text.trim(),
+          veterinarian:
+              _vetCtrl.text.trim().isEmpty ? null : _vetCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
         );
       }
@@ -368,7 +419,8 @@ class _VaccineFormState extends ConsumerState<_VaccineForm> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppTheme.error),
+          SnackBar(
+              content: Text(e.toString()), backgroundColor: AppTheme.error),
         );
       }
     } finally {
@@ -379,15 +431,19 @@ class _VaccineFormState extends ConsumerState<_VaccineForm> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+      padding: EdgeInsets.fromLTRB(
+          16, 16, 16, MediaQuery.of(context).viewInsets.bottom + 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(widget.editing == null ? 'Registrar vacuna' : 'Editar vacuna',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+              style:
+                  const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
           const SizedBox(height: 16),
-          TextField(controller: _nameCtrl, decoration: const InputDecoration(labelText: 'Vacuna *')),
+          TextField(
+              controller: _nameCtrl,
+              decoration: const InputDecoration(labelText: 'Vacuna *')),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -400,11 +456,14 @@ class _VaccineFormState extends ConsumerState<_VaccineForm> {
                       firstDate: DateTime(2000),
                       lastDate: DateTime.now(),
                     );
-                    if (d != null) setState(() => _appliedDate = d.toIso8601String().split('T').first);
+                    if (d != null)
+                      setState(() =>
+                          _appliedDate = d.toIso8601String().split('T').first);
                   },
                   child: AbsorbPointer(
                     child: TextField(
-                      decoration: const InputDecoration(labelText: 'Aplicada el *'),
+                      decoration:
+                          const InputDecoration(labelText: 'Aplicada el *'),
                       controller: TextEditingController(text: _appliedDate),
                     ),
                   ),
@@ -416,16 +475,21 @@ class _VaccineFormState extends ConsumerState<_VaccineForm> {
                   onTap: () async {
                     final d = await showDatePicker(
                       context: context,
-                      initialDate: DateTime.now().add(const Duration(days: 365)),
+                      initialDate:
+                          DateTime.now().add(const Duration(days: 365)),
                       firstDate: DateTime.now(),
                       lastDate: DateTime(2040),
                     );
-                    if (d != null) setState(() => _nextDueDate = d.toIso8601String().split('T').first);
+                    if (d != null)
+                      setState(() =>
+                          _nextDueDate = d.toIso8601String().split('T').first);
                   },
                   child: AbsorbPointer(
                     child: TextField(
-                      decoration: const InputDecoration(labelText: 'Próxima dosis'),
-                      controller: TextEditingController(text: _nextDueDate ?? ''),
+                      decoration:
+                          const InputDecoration(labelText: 'Próxima dosis'),
+                      controller:
+                          TextEditingController(text: _nextDueDate ?? ''),
                     ),
                   ),
                 ),
@@ -433,17 +497,25 @@ class _VaccineFormState extends ConsumerState<_VaccineForm> {
             ],
           ),
           const SizedBox(height: 10),
-          TextField(controller: _vetCtrl, decoration: const InputDecoration(labelText: 'Veterinario')),
+          TextField(
+              controller: _vetCtrl,
+              decoration: const InputDecoration(labelText: 'Veterinario')),
           const SizedBox(height: 10),
-          TextField(controller: _notesCtrl, decoration: const InputDecoration(labelText: 'Notas'), maxLines: 2),
+          TextField(
+              controller: _notesCtrl,
+              decoration: const InputDecoration(labelText: 'Notas'),
+              maxLines: 2),
           const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               onPressed: _saving ? null : _save,
               child: _saving
-                  ? const SizedBox(height: 20, width: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
                   : const Text('Guardar'),
             ),
           ),

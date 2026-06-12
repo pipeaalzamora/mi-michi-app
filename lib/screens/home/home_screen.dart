@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,11 +7,13 @@ import '../../core/cats/cats_provider.dart';
 import '../../core/theme/cat_theme.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../models/cat.dart';
+import '../../models/external_cat_content.dart';
 import '../../models/health_log.dart';
 import '../../data/life_stages.dart';
 import '../../widgets/weight_widget.dart';
-import '../../widgets/cat_3d_viewer.dart';
+import '../../widgets/cat_avatar_visual.dart';
 import '../../services/health_service.dart';
+import '../../services/integrations_service.dart';
 
 const _tips = [
   'Los gatos duermen entre 12 y 16 horas al día. ¡Es normal!',
@@ -29,12 +32,14 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<HealthLog> _weightLogs = [];
+  CataasImageInfo? _catImage;
 
   @override
   void initState() {
     super.initState();
     // Cargar logs de peso cuando el gato activo esté disponible
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadWeightLogs());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadExternalContent());
   }
 
   Future<void> _loadWeightLogs() async {
@@ -47,6 +52,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           _weightLogs = logs.where((l) => l.logType == 'peso').toList();
         });
       }
+    } catch (_) {}
+  }
+
+  Future<void> _loadExternalContent() async {
+    try {
+      final image = await IntegrationsService.catImage();
+      if (mounted) setState(() => _catImage = image);
     } catch (_) {}
   }
 
@@ -65,7 +77,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
 
     if (catsState.loading) {
-      return Scaffold(body: Center(child: CircularProgressIndicator(color: catTheme.primary)));
+      return Scaffold(
+          body: Center(
+              child: CircularProgressIndicator(color: catTheme.primary)));
     }
 
     // Sin gatos — pantalla de bienvenida
@@ -93,7 +107,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 TextButton(
                   onPressed: () => ref.read(authProvider.notifier).signOut(),
-                  child: Text('Cerrar sesión', style: TextStyle(color: Colors.grey[500])),
+                  child: Text('Cerrar sesión',
+                      style: TextStyle(color: Colors.grey[500])),
                 ),
               ],
             ),
@@ -106,7 +121,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: SafeArea(
         child: RefreshIndicator(
           color: catTheme.primary,
-          onRefresh: () => ref.read(catsProvider.notifier).refresh(),
+          onRefresh: () async {
+            await ref.read(catsProvider.notifier).refresh();
+            await _loadWeightLogs();
+            await _loadExternalContent();
+          },
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
             children: [
@@ -118,7 +137,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Hola 👋',
-                            style: TextStyle(fontSize: 13, color: Colors.grey[500])),
+                            style: TextStyle(
+                                fontSize: 13, color: Colors.grey[500])),
                         _CatSelector(
                           cats: catsState.cats,
                           activeCatId: catsState.activeCatId,
@@ -141,7 +161,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 16),
 
               // Hero del gato activo
-              if (activeCat != null) _CatHeroCard(cat: activeCat, catTheme: catTheme),
+              if (activeCat != null)
+                _CatHeroCard(cat: activeCat, catTheme: catTheme),
               const SizedBox(height: 16),
 
               // Widget de peso
@@ -154,7 +175,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 16),
 
               // Tip del día
-              _TipCard(tip: tip),
+              _TipCard(tip: tip, imageUrl: _catImage?.url),
               const SizedBox(height: 16),
 
               // Accesos rápidos
@@ -168,6 +189,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   const SizedBox(width: 12),
                   _QuickAction(
+                    label: 'Salud',
+                    emoji: '❤️',
+                    color: const Color(0xFFFFE4E6),
+                    onTap: () => context.push('/health'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _QuickAction(
                     label: 'Alimentos',
                     emoji: '🍗',
                     color: const Color(0xFFD1FAE5),
@@ -175,10 +207,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   const SizedBox(width: 12),
                   _QuickAction(
-                    label: 'Salud',
-                    emoji: '❤️',
-                    color: const Color(0xFFFFE4E6),
-                    onTap: () => context.push('/health'),
+                    label: 'Razas',
+                    emoji: '📚',
+                    color: const Color(0xFFE0F2FE),
+                    onTap: () => context.push('/breeds'),
                   ),
                 ],
               ),
@@ -215,7 +247,9 @@ class _CatSelector extends StatelessWidget {
       items: cats
           .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
           .toList(),
-      onChanged: (id) { if (id != null) onChanged(id); },
+      onChanged: (id) {
+        if (id != null) onChanged(id);
+      },
     );
   }
 }
@@ -247,13 +281,9 @@ class _CatHeroCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Modelo 3D compacto
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            child: Cat3DViewerCompact(
-              color: cat.color,
-              breed: cat.breed,
-            ),
+            child: CatAvatarVisual(cat: cat, height: 160),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
@@ -267,13 +297,17 @@ class _CatHeroCard extends StatelessWidget {
                         children: [
                           Text(cat.name,
                               style: const TextStyle(
-                                  fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white)),
                           Text(age,
-                              style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 14)),
                           if (stage != null)
                             Container(
                               margin: const EdgeInsets.only(top: 6),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
                                 color: Colors.white24,
                                 borderRadius: BorderRadius.circular(20),
@@ -297,7 +331,8 @@ class _CatHeroCard extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
                       side: const BorderSide(color: Colors.white38),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
                     ),
                     child: const Text('Ver perfil completo'),
                   ),
@@ -336,8 +371,7 @@ class _LifeStageCard extends StatelessWidget {
                   Text(stage.ageRange,
                       style: TextStyle(color: Colors.grey[500], fontSize: 12)),
                   const SizedBox(height: 4),
-                  Text(stage.description,
-                      style: const TextStyle(fontSize: 13)),
+                  Text(stage.description, style: const TextStyle(fontSize: 13)),
                 ],
               ),
             ),
@@ -350,7 +384,8 @@ class _LifeStageCard extends StatelessWidget {
 
 class _TipCard extends StatelessWidget {
   final String tip;
-  const _TipCard({required this.tip});
+  final String? imageUrl;
+  const _TipCard({required this.tip, this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -360,24 +395,39 @@ class _TipCard extends StatelessWidget {
         color: const Color(0xFFD1FAE5),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.lightbulb_outline, color: Color(0xFF059669)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Tip del día',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF065F46))),
-                const SizedBox(height: 4),
-                Text(tip,
-                    style: const TextStyle(
-                        fontSize: 13, color: Color(0xFF065F46))),
-              ],
+          if (imageUrl != null && imageUrl!.isNotEmpty) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: CachedNetworkImage(
+                imageUrl: imageUrl!,
+                height: 150,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => Container(
+                  height: 150,
+                  color: const Color(0xFFE5E7EB),
+                ),
+                errorWidget: (_, __, ___) => const SizedBox(),
+              ),
             ),
+            const SizedBox(height: 12),
+          ],
+          const Row(
+            children: [
+              Icon(Icons.lightbulb_outline, color: Color(0xFF059669)),
+              SizedBox(width: 8),
+              Text('Dato del día',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w800, color: Color(0xFF065F46))),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            tip,
+            style: const TextStyle(fontSize: 13, color: Color(0xFF065F46)),
           ),
         ],
       ),

@@ -14,23 +14,24 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     final saved = prefs.getString(_key);
     state = switch (saved) {
       'light' => ThemeMode.light,
-      'dark'  => ThemeMode.dark,
-      _       => ThemeMode.system,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.system,
     };
   }
 
   Future<void> setMode(ThemeMode mode) async {
     state = mode;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_key, switch (mode) {
-      ThemeMode.light  => 'light',
-      ThemeMode.dark   => 'dark',
-      ThemeMode.system => 'system',
-    });
+    await prefs.setString(
+        _key,
+        switch (mode) {
+          ThemeMode.light => 'light',
+          ThemeMode.dark => 'dark',
+          ThemeMode.system => 'system',
+        });
   }
 }
 
-final themeModeProvider =
-    StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
   (_) => ThemeModeNotifier(),
 );

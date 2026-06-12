@@ -17,9 +17,8 @@ class WeightWidget extends StatelessWidget {
 
     final latest = weightLogs.first;
     final previous = weightLogs.length > 1 ? weightLogs[1] : null;
-    final diff = previous != null
-        ? latest.numericValue! - previous.numericValue!
-        : null;
+    final diff =
+        previous != null ? latest.numericValue! - previous.numericValue! : null;
 
     final isUp = diff != null && diff > 0;
     final isDown = diff != null && diff < 0;
@@ -71,9 +70,7 @@ class WeightWidget extends StatelessWidget {
             Text(
               '${diff > 0 ? '+' : ''}${diff.toStringAsFixed(1)} kg',
               style: TextStyle(
-                  color: trendColor,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13),
+                  color: trendColor, fontWeight: FontWeight.w700, fontSize: 13),
             ),
           ],
         ],

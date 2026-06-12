@@ -6,11 +6,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 const _tokenKey = 'mi_michi_jwt';
 
 class ApiClient {
-  // En emulador Android: 10.0.2.2 apunta al localhost de la máquina host
-  // En dispositivo físico: usa la IP de tu máquina en la red local (ej: 192.168.1.x)
+  // Para desarrollo local se puede sobreescribir con:
+  // --dart-define=API_BASE_URL=http://10.0.2.2:8080
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.1.3:8080',
+    defaultValue: 'https://mimichi-backend.onrender.com',
   );
 
   static const _storage = FlutterSecureStorage();

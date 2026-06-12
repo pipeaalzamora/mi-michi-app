@@ -34,7 +34,8 @@ class VaccinesService {
     String? veterinarian,
     String? notes,
   }) async {
-    final res = await ApiClient.dio.put('/api/cats/$catId/vaccines/$vacId', data: {
+    final res =
+        await ApiClient.dio.put('/api/cats/$catId/vaccines/$vacId', data: {
       'name': name,
       'applied_date': appliedDate,
       'next_due_date': nextDueDate,

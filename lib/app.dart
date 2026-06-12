@@ -5,7 +5,9 @@ import 'core/auth/auth_provider.dart';
 import 'core/theme/cat_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/theme/theme_mode_provider.dart';
+import 'screens/adoptions/adoptions_screen.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/breeds/breeds_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/cats/cats_list_screen.dart';
@@ -67,6 +69,10 @@ GoRouter _createRouter({
                 path: '/vaccines', builder: (_, __) => const VaccinesScreen()),
             GoRoute(path: '/foods', builder: (_, __) => const FoodsScreen()),
             GoRoute(path: '/tips', builder: (_, __) => const TipsScreen()),
+            GoRoute(path: '/breeds', builder: (_, __) => const BreedsScreen()),
+            GoRoute(
+                path: '/adoptions',
+                builder: (_, __) => const AdoptionsScreen()),
             GoRoute(
                 path: '/settings', builder: (_, __) => const SettingsScreen()),
           ],
@@ -162,7 +168,12 @@ class _MainShell extends ConsumerWidget {
     if (location.startsWith('/cats')) return 1;
     if (location.startsWith('/health')) return 2;
     if (location.startsWith('/vaccines')) return 3;
-    if (location.startsWith('/tips') || location.startsWith('/foods')) return 4;
+    if (location.startsWith('/tips') ||
+        location.startsWith('/foods') ||
+        location.startsWith('/breeds') ||
+        location.startsWith('/adoptions')) {
+      return 4;
+    }
     return 0;
   }
 
