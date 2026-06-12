@@ -1,4 +1,4 @@
-package com.mimichi.mi_michi
+package cl.pipeaalzamora.cats
 
 import io.flutter.embedding.android.FlutterActivity
 

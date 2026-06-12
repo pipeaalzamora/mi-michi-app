@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.mimichi.mi_michi"
+    namespace = "cl.pipeaalzamora.cats"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.mimichi.mi_michi"
+        applicationId = "cl.pipeaalzamora.cats"
         minSdk = flutter.minSdkVersion  // flutter_local_notifications requiere mínimo 21
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -38,7 +38,7 @@ android {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.14.1"))
     implementation("com.google.firebase:firebase-analytics")
 }
 

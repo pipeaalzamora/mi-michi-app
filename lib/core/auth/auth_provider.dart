@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/user_profile.dart';
 import '../api/api_client.dart';
+import '../cats/cats_provider.dart';
+import '../../services/auth_service.dart';
 
 enum AuthStatus { loading, authenticated, unauthenticated }
 
@@ -23,49 +25,59 @@ class AuthState {
       );
 }
 
-// Usuario demo — sin auth
-const _demoUser = UserProfile(
-  id: 'demo-user',
-  email: 'demo@mimichi.app',
-  displayName: 'Demo',
-  picture: '',
-);
-
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(const AuthState()) {
+  final Ref _ref;
+
+  AuthNotifier(this._ref) : super(const AuthState()) {
     ApiClient.onUnauthorized = () {
+      _ref.read(catsProvider.notifier).clear();
       state = const AuthState(status: AuthStatus.unauthenticated);
     };
-    // Autologin inmediato
-    Future.microtask(() {
-      state = const AuthState(
-        status: AuthStatus.authenticated,
-        user: _demoUser,
+    Future.microtask(_init);
+  }
+
+  Future<void> _init() async {
+    try {
+      final user = await AuthService.currentUserProfile();
+      if (user == null) {
+        state = const AuthState(status: AuthStatus.unauthenticated);
+        return;
+      }
+      state = AuthState(status: AuthStatus.authenticated, user: user);
+    } catch (e) {
+      state = AuthState(
+        status: AuthStatus.unauthenticated,
+        error: e.toString(),
       );
-    });
+    }
   }
 
   Future<void> signInWithGoogle() async {
-    state = const AuthState(status: AuthStatus.authenticated, user: _demoUser);
+    state = const AuthState(status: AuthStatus.loading);
+    try {
+      final user = await AuthService.signInWithGoogle();
+      state = AuthState(status: AuthStatus.authenticated, user: user);
+      await _ref.read(catsProvider.notifier).refresh();
+    } catch (e) {
+      state = AuthState(
+        status: AuthStatus.unauthenticated,
+        error: e.toString(),
+      );
+    }
   }
 
   Future<void> signOut() async {
-    await ApiClient.clearToken();
+    await AuthService.signOut();
+    _ref.read(catsProvider.notifier).clear();
     state = const AuthState(status: AuthStatus.unauthenticated);
   }
 
   Future<void> updateDisplayName(String name) async {
-    state = state.copyWith(
-      user: UserProfile(
-        id: _demoUser.id,
-        email: _demoUser.email,
-        displayName: name,
-        picture: _demoUser.picture,
-      ),
-    );
+    final user = await AuthService.updateDisplayName(name);
+    state = state.copyWith(user: user);
   }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
-  (_) => AuthNotifier(),
+  (ref) => AuthNotifier(ref),
 );

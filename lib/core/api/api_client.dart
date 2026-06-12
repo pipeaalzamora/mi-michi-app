@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -12,7 +13,7 @@ class ApiClient {
     defaultValue: 'http://192.168.1.3:8080',
   );
 
-  static final _storage = const FlutterSecureStorage();
+  static const _storage = FlutterSecureStorage();
   static late final Dio _dio;
 
   // Callback para forzar logout cuando el token expira
@@ -38,7 +39,9 @@ class ApiClient {
     // Interceptor: JWT + manejo de 401
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final token = await _storage.read(key: _tokenKey);
+        final firebaseUser = FirebaseAuth.instance.currentUser;
+        final firebaseToken = await firebaseUser?.getIdToken();
+        final token = firebaseToken ?? await _storage.read(key: _tokenKey);
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }
@@ -82,7 +85,8 @@ class ApiClient {
     } catch (_) {}
     return switch (error.type) {
       DioExceptionType.connectionTimeout => 'No se pudo conectar al servidor',
-      DioExceptionType.receiveTimeout => 'El servidor tardó demasiado en responder',
+      DioExceptionType.receiveTimeout =>
+        'El servidor tardó demasiado en responder',
       DioExceptionType.connectionError => 'Sin conexión. Verifica tu red.',
       _ => error.message ?? 'Error desconocido',
     };

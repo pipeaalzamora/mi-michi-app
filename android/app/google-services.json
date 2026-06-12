@@ -7,35 +7,72 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1057417146171:android:ca8e8d0a9e375dd86ed11e",
+        "mobilesdk_app_id": "1:1057417146171:android:2415af072af0a5736ed11e",
         "android_client_info": {
-          "package_name": "com.mimichi.mi_michi"
+          "package_name": "cl.pipeaalzamora.baby_mobile"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1057417146171-m546ackt09mt52q68i7hftpe02crm1nh.apps.googleusercontent.com",
+          "client_id": "1057417146171-u2jphou17pq86kagv3oooic5g0g63a9l.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.mimichi.mi_michi",
-            "certificate_hash": "f537732a6a32599cffe949728c3cbdcd79b3d009"
+            "package_name": "cl.pipeaalzamora.baby_mobile",
+            "certificate_hash": "11e1980053d9c497398a16440d7cda5a9f47c402"
           }
         },
         {
-          "client_id": "1057417146171-7tbgg2ulho9falmt8qhf4ip61v1h722n.apps.googleusercontent.com",
+          "client_id": "1057417146171-kmie6i3dh6giduvuopejeqi2nsqh76de.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAcRHHqVpBAyVC9U6yDx0zTRwbyB78j09U"
+          "current_key": "AIzaSyAhxc6FptoOlHQ_Kxt290tgHzGKOmwPQsE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1057417146171-7tbgg2ulho9falmt8qhf4ip61v1h722n.apps.googleusercontent.com",
+              "client_id": "1057417146171-kmie6i3dh6giduvuopejeqi2nsqh76de.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057417146171:android:be2501ef06a6dc126ed11e",
+        "android_client_info": {
+          "package_name": "cl.pipeaalzamora.cats"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1057417146171-6g2tr92fj0ljaia4ifsqpnmh4jqd6mpi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cl.pipeaalzamora.cats",
+            "certificate_hash": "11e1980053d9c497398a16440d7cda5a9f47c402"
+          }
+        },
+        {
+          "client_id": "1057417146171-kmie6i3dh6giduvuopejeqi2nsqh76de.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhxc6FptoOlHQ_Kxt290tgHzGKOmwPQsE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1057417146171-kmie6i3dh6giduvuopejeqi2nsqh76de.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
