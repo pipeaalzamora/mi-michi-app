@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_extensions.dart';
 
 const _tips = [
   {
@@ -132,13 +133,16 @@ class _TipsScreenState extends State<TipsScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      color: active ? AppTheme.primary : Colors.grey[100],
+                      color: active ? AppTheme.primary : context.subtleFill,
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: active ? AppTheme.primary : context.appBorder,
+                      ),
                     ),
                     child: Text(
                       cat,
                       style: TextStyle(
-                        color: active ? Colors.white : Colors.grey[700],
+                        color: active ? Colors.white : context.softText,
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
                       ),
@@ -158,11 +162,12 @@ class _TipsScreenState extends State<TipsScreen> {
                 return Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.cardFill,
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: context.appBorder),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: context.softShadow,
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),

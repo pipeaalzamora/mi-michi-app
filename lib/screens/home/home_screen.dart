@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/auth/auth_provider.dart';
 import '../../core/cats/cats_provider.dart';
 import '../../core/theme/cat_theme.dart';
+import '../../core/theme/theme_extensions.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../models/cat.dart';
 import '../../models/external_cat_content.dart';
@@ -98,7 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     textAlign: TextAlign.center),
                 const SizedBox(height: 12),
                 Text('Para empezar, cuéntanos sobre tu primer gatito.',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                    style: TextStyle(color: context.softText, fontSize: 16),
                     textAlign: TextAlign.center),
                 const SizedBox(height: 40),
                 ElevatedButton(
@@ -108,7 +109,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 TextButton(
                   onPressed: () => ref.read(authProvider.notifier).signOut(),
                   child: Text('Cerrar sesión',
-                      style: TextStyle(color: Colors.grey[500])),
+                      style: TextStyle(color: context.softText)),
                 ),
               ],
             ),
@@ -138,7 +139,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       children: [
                         Text('Hola 👋',
                             style: TextStyle(
-                                fontSize: 13, color: Colors.grey[500])),
+                                fontSize: 13, color: context.softText)),
                         _CatSelector(
                           cats: catsState.cats,
                           activeCatId: catsState.activeCatId,
@@ -152,7 +153,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     onPressed: () => context.push('/settings'),
                     icon: const Icon(Icons.settings_outlined),
                     style: IconButton.styleFrom(
-                      backgroundColor: Colors.white,
+                      backgroundColor: context.cardFill,
                       shape: const CircleBorder(),
                     ),
                   ),
@@ -242,8 +243,11 @@ class _CatSelector extends StatelessWidget {
     return DropdownButton<String>(
       value: activeCatId ?? cats.first.id,
       underline: const SizedBox(),
-      style: const TextStyle(
-          fontSize: 22, fontWeight: FontWeight.w800, color: Color(0xFF1E1B4B)),
+      style: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w800,
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
       items: cats
           .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
           .toList(),
@@ -369,7 +373,7 @@ class _LifeStageCard extends StatelessWidget {
                       style: const TextStyle(
                           fontWeight: FontWeight.w700, fontSize: 16)),
                   Text(stage.ageRange,
-                      style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                      style: TextStyle(color: context.softText, fontSize: 12)),
                   const SizedBox(height: 4),
                   Text(stage.description, style: const TextStyle(fontSize: 13)),
                 ],
@@ -389,10 +393,16 @@ class _TipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+    final bg = isDark ? const Color(0xFF12382E) : const Color(0xFFD1FAE5);
+    final titleColor =
+        isDark ? const Color(0xFF8EE7C5) : const Color(0xFF065F46);
+    final textColor =
+        isDark ? const Color(0xFFD1FAE5) : const Color(0xFF065F46);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFD1FAE5),
+        color: bg,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -408,26 +418,26 @@ class _TipCard extends StatelessWidget {
                 fit: BoxFit.cover,
                 placeholder: (_, __) => Container(
                   height: 150,
-                  color: const Color(0xFFE5E7EB),
+                  color: context.placeholderFill,
                 ),
                 errorWidget: (_, __, ___) => const SizedBox(),
               ),
             ),
             const SizedBox(height: 12),
           ],
-          const Row(
+          Row(
             children: [
-              Icon(Icons.lightbulb_outline, color: Color(0xFF059669)),
-              SizedBox(width: 8),
+              Icon(Icons.lightbulb_outline, color: titleColor),
+              const SizedBox(width: 8),
               Text('Dato del día',
                   style: TextStyle(
-                      fontWeight: FontWeight.w800, color: Color(0xFF065F46))),
+                      fontWeight: FontWeight.w800, color: titleColor)),
             ],
           ),
           const SizedBox(height: 6),
           Text(
             tip,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF065F46)),
+            style: TextStyle(fontSize: 13, color: textColor),
           ),
         ],
       ),
@@ -450,14 +460,16 @@ class _QuickAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fill = context.softTint(color);
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: color,
+            color: fill,
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: context.appBorder.withValues(alpha: 0.6)),
           ),
           child: Column(
             children: [

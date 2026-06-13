@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_extensions.dart';
 import '../../models/adoption_cat.dart';
 import '../../services/integrations_service.dart';
 
@@ -54,9 +55,9 @@ class _AdoptionsScreenState extends State<AdoptionsScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.cardFill,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: context.appBorder),
             ),
             child: Column(
               children: [
@@ -130,9 +131,9 @@ class _AdoptionCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardFill,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: context.appBorder),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,7 +144,7 @@ class _AdoptionCard extends StatelessWidget {
                 ? Container(
                     width: 96,
                     height: 110,
-                    color: const Color(0xFFF3F4F6),
+                    color: context.placeholderFill,
                     child: const Icon(Icons.pets_outlined,
                         color: AppTheme.primary),
                   )
@@ -168,7 +169,7 @@ class _AdoptionCard extends StatelessWidget {
                     if (cat.gender.isNotEmpty) cat.gender,
                     if (cat.size.isNotEmpty) cat.size,
                   ].join(' · '),
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  style: TextStyle(color: context.softText, fontSize: 12),
                 ),
                 if (cat.breeds.isNotEmpty) ...[
                   const SizedBox(height: 6),
@@ -214,12 +215,12 @@ class _MessageState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, size: 44, color: Colors.grey),
+        Icon(icon, size: 44, color: context.softText),
         const SizedBox(height: 10),
         Text(
           message,
           textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey[600]),
+          style: TextStyle(color: context.softText),
         ),
       ],
     );

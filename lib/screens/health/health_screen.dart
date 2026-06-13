@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../core/cats/cats_provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_extensions.dart';
 import '../../models/health_log.dart';
 import '../../services/health_service.dart';
 
@@ -66,6 +67,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) => _LogForm(catId: catId, editing: editing, onSaved: _fetch),
@@ -134,7 +136,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                       const Text('😿', style: TextStyle(fontSize: 48)),
                       const SizedBox(height: 12),
                       Text('Error al cargar',
-                          style: TextStyle(color: Colors.grey[600])),
+                          style: TextStyle(color: context.softText)),
                       const SizedBox(height: 8),
                       ElevatedButton(
                           onPressed: _fetch, child: const Text('Reintentar')),
@@ -219,11 +221,11 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                                     style: TextStyle(fontSize: 40)),
                                 const SizedBox(height: 8),
                                 Text('Aún no hay registros.',
-                                    style: TextStyle(color: Colors.grey[500])),
+                                    style: TextStyle(color: context.softText)),
                                 const SizedBox(height: 4),
                                 Text('Toca + para añadir el primero.',
                                     style: TextStyle(
-                                        color: Colors.grey[400], fontSize: 12)),
+                                        color: context.softText, fontSize: 12)),
                               ],
                             ),
                           ),
@@ -254,12 +256,15 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-            color: color, borderRadius: BorderRadius.circular(16)),
+          color: context.softTint(color),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: context.appBorder.withValues(alpha: 0.7)),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(label,
-                style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+                style: TextStyle(fontSize: 12, color: context.softText)),
             const SizedBox(height: 4),
             Text(value,
                 style:
@@ -289,7 +294,7 @@ class _LogCard extends StatelessWidget {
         title: Text(log.title,
             style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Text('${meta.label} · ${log.logDate}',
-            style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+            style: TextStyle(fontSize: 12, color: context.softText)),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

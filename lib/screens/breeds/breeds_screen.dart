@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_extensions.dart';
+import '../../data/cat_breed_localizations.dart';
 import '../../models/cat_breed_info.dart';
 import '../../models/external_cat_content.dart';
 import '../../services/integrations_service.dart';
@@ -55,12 +57,14 @@ class _BreedsScreenState extends State<BreedsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final query = _searchCtrl.text.trim().toLowerCase();
+    final query = CatBreedLocalizations.searchable(_searchCtrl.text.trim());
     final filtered = _breeds.where((breed) {
       if (query.isEmpty) return true;
-      return breed.name.toLowerCase().contains(query) ||
-          breed.origin.toLowerCase().contains(query) ||
-          breed.temperament.toLowerCase().contains(query);
+      final localized = CatBreedLocalizations.from(breed);
+      final sourceText = CatBreedLocalizations.searchable(
+        '${breed.name} ${breed.origin} ${breed.temperament}',
+      );
+      return localized.searchText.contains(query) || sourceText.contains(query);
     }).toList();
 
     return Scaffold(
@@ -108,6 +112,7 @@ class _BreedsScreenState extends State<BreedsScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
       ),
@@ -124,10 +129,11 @@ class _BreedTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localized = CatBreedLocalizations.from(breed);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
-        color: Colors.white,
+        color: context.cardFill,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: onTap,
@@ -136,14 +142,16 @@ class _BreedTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: context.appBorder),
             ),
             child: Row(
               children: [
                 CircleAvatar(
                   backgroundColor: AppTheme.primary.withValues(alpha: 0.12),
                   child: Text(
-                    breed.name.isEmpty ? '?' : breed.name.substring(0, 1),
+                    localized.name.isEmpty
+                        ? '?'
+                        : localized.name.substring(0, 1),
                     style: const TextStyle(
                       color: AppTheme.primary,
                       fontWeight: FontWeight.w800,
@@ -156,19 +164,19 @@ class _BreedTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        breed.name,
+                        localized.name,
                         style: const TextStyle(fontWeight: FontWeight.w800),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         [
-                          if (breed.origin.isNotEmpty) breed.origin,
+                          if (localized.origin.isNotEmpty) localized.origin,
                           if (breed.lifeSpan.isNotEmpty)
                             '${breed.lifeSpan} años',
                         ].join(' · '),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey[700]),
+                        style: TextStyle(color: context.softText),
                       ),
                     ],
                   ),
@@ -206,6 +214,7 @@ class _BreedDetailsSheetState extends State<_BreedDetailsSheet> {
   @override
   Widget build(BuildContext context) {
     final breed = widget.breed;
+    final localized = CatBreedLocalizations.from(breed);
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.86,
@@ -220,24 +229,24 @@ class _BreedDetailsSheetState extends State<_BreedDetailsSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: context.appBorder,
                 borderRadius: BorderRadius.circular(99),
               ),
             ),
           ),
           const SizedBox(height: 18),
           Text(
-            breed.name,
+            localized.name,
             style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 4),
           Text(
             [
-              if (breed.origin.isNotEmpty) breed.origin,
+              if (localized.origin.isNotEmpty) localized.origin,
               if (breed.weightMetric.isNotEmpty) '${breed.weightMetric} kg',
               if (breed.lifeSpan.isNotEmpty) '${breed.lifeSpan} años',
             ].join(' · '),
-            style: TextStyle(color: Colors.grey[600]),
+            style: TextStyle(color: context.softText),
           ),
           const SizedBox(height: 16),
           FutureBuilder<List<CatImageInfo>>(
@@ -266,7 +275,7 @@ class _BreedDetailsSheetState extends State<_BreedDetailsSheet> {
                       fit: BoxFit.cover,
                       placeholder: (_, __) => Container(
                         width: 220,
-                        color: const Color(0xFFF3F4F6),
+                        color: context.placeholderFill,
                       ),
                       errorWidget: (_, __, ___) =>
                           const Icon(Icons.broken_image_outlined),
@@ -277,21 +286,19 @@ class _BreedDetailsSheetState extends State<_BreedDetailsSheet> {
             },
           ),
           const SizedBox(height: 18),
-          if (breed.description.isNotEmpty)
-            Text(
-              breed.description,
-              style: const TextStyle(fontSize: 14, height: 1.45),
-            ),
+          Text(
+            localized.description,
+            style: const TextStyle(fontSize: 14, height: 1.45),
+          ),
           const SizedBox(height: 18),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              if (breed.temperament.isNotEmpty)
-                ...breed.temperament
-                    .split(',')
+              if (localized.temperaments.isNotEmpty)
+                ...localized.temperaments
                     .take(6)
-                    .map((tag) => _InfoChip(label: tag.trim())),
+                    .map((tag) => _InfoChip(label: tag)),
               if (breed.hypoallergenic)
                 const _InfoChip(label: 'Hipoalergénico'),
             ],
@@ -320,7 +327,7 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3F4F6),
+        color: context.chipFill,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
@@ -346,7 +353,7 @@ class _ScoreRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 96,
-            child: Text(label, style: TextStyle(color: Colors.grey[700])),
+            child: Text(label, style: TextStyle(color: context.softText)),
           ),
           Expanded(
             child: ClipRRect(
@@ -354,7 +361,7 @@ class _ScoreRow extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: value.clamp(0, 5) / 5,
                 minHeight: 8,
-                backgroundColor: const Color(0xFFF3F4F6),
+                backgroundColor: context.chipFill,
                 color: AppTheme.primary,
               ),
             ),
@@ -379,12 +386,12 @@ class _ErrorState extends StatelessWidget {
       padding: const EdgeInsets.only(top: 120),
       child: Column(
         children: [
-          const Icon(Icons.cloud_off_outlined, size: 42, color: Colors.grey),
+          Icon(Icons.cloud_off_outlined, size: 42, color: context.softText),
           const SizedBox(height: 12),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[600]),
+            style: TextStyle(color: context.softText),
           ),
           const SizedBox(height: 16),
           OutlinedButton(onPressed: onRetry, child: const Text('Reintentar')),

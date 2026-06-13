@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/auth/auth_provider.dart';
+import '../../core/theme/theme_extensions.dart';
 import '../../core/theme/theme_mode_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -78,13 +79,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Expanded(
                         child: Text(user?.email ?? '',
                             style: TextStyle(
-                                color: Colors.grey[600], fontSize: 13)),
+                                color: context.softText, fontSize: 13)),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text('Nombre visible',
-                      style: TextStyle(fontSize: 13, color: Colors.grey)),
+                  Text('Nombre visible',
+                      style: TextStyle(fontSize: 13, color: context.softText)),
                   const SizedBox(height: 6),
                   if (_editingName)
                     Row(
@@ -182,7 +183,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         : themeMode == ThemeMode.dark
                             ? 'Modo oscuro activado.'
                             : 'Modo claro activado.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                    style: TextStyle(fontSize: 12, color: context.softText),
                   ),
                 ],
               ),
@@ -237,23 +238,23 @@ class _ThemeOption extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             color:
-                selected ? primary.withValues(alpha: 0.12) : Colors.grey[100],
+                selected ? primary.withValues(alpha: 0.12) : context.subtleFill,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: selected ? primary : Colors.transparent,
+              color: selected ? primary : context.appBorder,
               width: 2,
             ),
           ),
           child: Column(
             children: [
               Icon(icon,
-                  color: selected ? primary : Colors.grey[500], size: 22),
+                  color: selected ? primary : context.softText, size: 22),
               const SizedBox(height: 4),
               Text(label,
                   style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: selected ? primary : Colors.grey[500])),
+                      color: selected ? primary : context.softText)),
             ],
           ),
         ),

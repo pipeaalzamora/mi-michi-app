@@ -7,6 +7,7 @@ import '../../core/cats/cats_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/cat.dart';
 import '../../data/cat_breeds.dart';
+import '../../data/cat_breed_localizations.dart';
 import '../../services/cats_service.dart';
 import '../../services/integrations_service.dart';
 
@@ -49,7 +50,9 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     final cat = _existing;
     if (cat != null) {
       _nameCtrl.text = cat.name;
-      _breedCtrl.text = cat.breed ?? '';
+      _breedCtrl.text = cat.breed == null
+          ? ''
+          : CatBreedLocalizations.displayStoredName(cat.breed!);
       _colorCtrl.text = cat.color ?? '';
       _weightCtrl.text = cat.weightKg?.toString() ?? '';
       _notesCtrl.text = cat.notes ?? '';
@@ -83,7 +86,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
     try {
       final breeds = await IntegrationsService.catBreeds();
       final names = breeds
-          .map((breed) => breed.name)
+          .map(CatBreedLocalizations.displayName)
           .where((name) => name.trim().isNotEmpty)
           .toSet()
           .toList()
@@ -216,7 +219,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
                   children: [
                     CircleAvatar(
                       radius: 56,
-                      backgroundColor: AppTheme.primary.withOpacity(0.15),
+                      backgroundColor: AppTheme.primary.withValues(alpha: 0.15),
                       backgroundImage: _localPhoto != null
                           ? FileImage(_localPhoto!)
                           : (_photoUrl != null
@@ -312,9 +315,10 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
               initialValue: TextEditingValue(text: _breedCtrl.text),
               optionsBuilder: (textEditingValue) {
                 if (textEditingValue.text.isEmpty) return _breedOptions;
-                return _breedOptions.where((b) => b
-                    .toLowerCase()
-                    .contains(textEditingValue.text.toLowerCase()));
+                final query =
+                    CatBreedLocalizations.searchable(textEditingValue.text);
+                return _breedOptions.where(
+                    (b) => CatBreedLocalizations.searchable(b).contains(query));
               },
               onSelected: (value) => _breedCtrl.text = value,
               fieldViewBuilder: (context, controller, focusNode, onSubmitted) {

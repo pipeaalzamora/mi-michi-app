@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/cats/cats_provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_extensions.dart';
 import '../../models/vaccine.dart';
 import '../../services/vaccines_service.dart';
 import '../../services/notification_service.dart';
@@ -70,6 +71,7 @@ class _VaccinesScreenState extends ConsumerState<VaccinesScreen> {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) => _VaccineForm(
@@ -136,7 +138,7 @@ class _VaccinesScreenState extends ConsumerState<VaccinesScreen> {
                       const Text('😿', style: TextStyle(fontSize: 48)),
                       const SizedBox(height: 12),
                       Text('Error al cargar',
-                          style: TextStyle(color: Colors.grey[600])),
+                          style: TextStyle(color: context.softText)),
                       const SizedBox(height: 8),
                       ElevatedButton(
                           onPressed: _fetch, child: const Text('Reintentar')),
@@ -158,13 +160,13 @@ class _VaccinesScreenState extends ConsumerState<VaccinesScreen> {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.grey[50],
+                            color: context.subtleFill,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey[200]!),
+                            border: Border.all(color: context.appBorder),
                           ),
                           child: Center(
                             child: Text('Aún no has registrado vacunas.',
-                                style: TextStyle(color: Colors.grey[500])),
+                                style: TextStyle(color: context.softText)),
                           ),
                         )
                       else
@@ -182,7 +184,7 @@ class _VaccinesScreenState extends ConsumerState<VaccinesScreen> {
                       const SizedBox(height: 4),
                       Text('Referencia general — confirma con tu veterinario.',
                           style:
-                              TextStyle(fontSize: 12, color: Colors.grey[500])),
+                              TextStyle(fontSize: 12, color: context.softText)),
                       const SizedBox(height: 8),
                       ...(_suggestedVaccines.map((sv) => _SuggestedCard(
                             name: sv['name']!,
@@ -246,17 +248,17 @@ class _VaccineCard extends StatelessWidget {
               ],
             ),
             Text('Aplicada: ${vaccine.appliedDate}',
-                style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                style: TextStyle(fontSize: 12, color: context.softText)),
             if (vaccine.veterinarian != null)
               Text('Vet: ${vaccine.veterinarian}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                  style: TextStyle(fontSize: 12, color: context.softText)),
             if (badgeText != null) ...[
               const SizedBox(height: 6),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: badgeColor!.withOpacity(0.12),
+                  color: badgeColor!.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text('Próxima: $badgeText',
@@ -301,8 +303,8 @@ class _SuggestedCard extends StatelessWidget {
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: isEssential
-                          ? AppTheme.error.withOpacity(0.1)
-                          : AppTheme.primary.withOpacity(0.1),
+                          ? AppTheme.error.withValues(alpha: 0.1)
+                          : AppTheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

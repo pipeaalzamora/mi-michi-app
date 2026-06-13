@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/theme_extensions.dart';
 import '../models/health_log.dart';
 
 class WeightWidget extends StatelessWidget {
@@ -36,11 +37,12 @@ class WeightWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardFill,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: context.appBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: context.softShadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

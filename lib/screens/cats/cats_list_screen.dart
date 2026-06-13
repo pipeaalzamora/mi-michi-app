@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/cats/cats_provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_extensions.dart';
 import '../../data/life_stages.dart';
 import '../../models/cat.dart';
 
@@ -70,7 +71,7 @@ class _CatsListScreenState extends ConsumerState<CatsListScreen> {
                               _search.isEmpty
                                   ? 'Aún no tienes gatos registrados'
                                   : 'No se encontró ningún gato',
-                              style: TextStyle(color: Colors.grey[500]),
+                              style: TextStyle(color: context.softText),
                             ),
                           ],
                         ),
@@ -103,13 +104,14 @@ class _CatCard extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.cardFill,
           borderRadius: BorderRadius.circular(20),
-          border:
-              isActive ? Border.all(color: AppTheme.primary, width: 2) : null,
+          border: Border.all(
+              color: isActive ? AppTheme.primary : context.appBorder,
+              width: isActive ? 2 : 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: context.softShadow,
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -119,7 +121,7 @@ class _CatCard extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundColor: AppTheme.primary.withOpacity(0.15),
+              backgroundColor: AppTheme.primary.withValues(alpha: 0.15),
               backgroundImage:
                   cat.photoUrl != null ? NetworkImage(cat.photoUrl!) : null,
               child: cat.photoUrl == null
@@ -141,7 +143,7 @@ class _CatCard extends ConsumerWidget {
                       style: const TextStyle(
                           fontWeight: FontWeight.w700, fontSize: 16)),
                   Text(age,
-                      style: TextStyle(color: Colors.grey[500], fontSize: 13)),
+                      style: TextStyle(color: context.softText, fontSize: 13)),
                   if (stage != null)
                     Text('${stage.emoji} ${stage.label}',
                         style: const TextStyle(fontSize: 12)),
@@ -152,7 +154,7 @@ class _CatCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withOpacity(0.1),
+                  color: AppTheme.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text('Activo',
@@ -162,7 +164,7 @@ class _CatCard extends ConsumerWidget {
                         fontWeight: FontWeight.w700)),
               ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right, color: Colors.grey),
+            Icon(Icons.chevron_right, color: context.softText),
           ],
         ),
       ),

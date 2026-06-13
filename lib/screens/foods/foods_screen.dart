@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_extensions.dart';
 import '../../models/food_product.dart';
 import '../../services/integrations_service.dart';
 
@@ -211,9 +212,9 @@ class _OnlineFoodLookup extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardFill,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: context.appBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,8 +311,9 @@ class _FoodProductCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: context.subtleFill,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: context.appBorder),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,7 +324,7 @@ class _FoodProductCard extends StatelessWidget {
                 ? Container(
                     width: 72,
                     height: 72,
-                    color: const Color(0xFFE5E7EB),
+                    color: context.placeholderFill,
                     child: const Icon(Icons.inventory_2_outlined),
                   )
                 : CachedNetworkImage(
@@ -343,7 +345,7 @@ class _FoodProductCard extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w800)),
                 if (product.brands.isNotEmpty)
                   Text(product.brands,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                      style: TextStyle(fontSize: 12, color: context.softText)),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 6,
@@ -385,7 +387,7 @@ class _MetricChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.chipFill,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
@@ -428,8 +430,10 @@ class _FoodCategory extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color,
+                color: context.softTint(color),
                 borderRadius: BorderRadius.circular(14),
+                border:
+                    Border.all(color: context.appBorder.withValues(alpha: 0.6)),
               ),
               child: Row(
                 children: [
@@ -442,7 +446,7 @@ class _FoodCategory extends StatelessWidget {
                                 const TextStyle(fontWeight: FontWeight.w600)),
                         Text(item['notes']!,
                             style: TextStyle(
-                                fontSize: 12, color: Colors.grey[700])),
+                                fontSize: 12, color: context.softText)),
                       ],
                     ),
                   ),

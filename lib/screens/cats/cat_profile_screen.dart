@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/cats/cats_provider.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/theme_extensions.dart';
 import '../../data/life_stages.dart';
 import '../../models/health_log.dart';
 import '../../models/vaccine.dart';
@@ -232,8 +233,9 @@ class CatProfileScreen extends ConsumerWidget {
                   _DataRow('Nacimiento', cat.birthDate ?? '—'),
                   if (cat.notes != null) ...[
                     const Divider(height: 20),
-                    const Text('Notas',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    Text('Notas',
+                        style:
+                            TextStyle(fontSize: 12, color: context.softText)),
                     const SizedBox(height: 4),
                     Text(cat.notes!),
                   ],
@@ -248,8 +250,9 @@ class CatProfileScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFEDE9FE),
+                color: context.softTint(const Color(0xFFEDE9FE)),
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: context.appBorder),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,25 +265,35 @@ class CatProfileScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(stage.label,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
-                                  color: Color(0xFF4C1D95))),
+                                  color: context.isDarkMode
+                                      ? const Color(0xFFE9D5FF)
+                                      : const Color(0xFF4C1D95))),
                           Text(stage.ageRange,
-                              style: const TextStyle(
-                                  fontSize: 12, color: Color(0xFF7C3AED))),
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: context.isDarkMode
+                                      ? const Color(0xFFC4B5FD)
+                                      : const Color(0xFF7C3AED))),
                         ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Text(stage.description,
-                      style: const TextStyle(color: Color(0xFF4C1D95))),
+                      style: TextStyle(
+                          color: context.isDarkMode
+                              ? const Color(0xFFE9D5FF)
+                              : const Color(0xFF4C1D95))),
                   const SizedBox(height: 12),
-                  const Text('Tips para esta etapa',
+                  Text('Tips para esta etapa',
                       style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF4C1D95))),
+                          color: context.isDarkMode
+                              ? const Color(0xFFE9D5FF)
+                              : const Color(0xFF4C1D95))),
                   const SizedBox(height: 6),
                   ...stage.tips.map((t) => Padding(
                         padding: const EdgeInsets.only(bottom: 4),
@@ -291,17 +304,26 @@ class CatProfileScreen extends ConsumerWidget {
                                 style: TextStyle(color: AppTheme.primary)),
                             Expanded(
                                 child: Text(t,
-                                    style: const TextStyle(
-                                        color: Color(0xFF4C1D95),
+                                    style: TextStyle(
+                                        color: context.isDarkMode
+                                            ? const Color(0xFFE9D5FF)
+                                            : const Color(0xFF4C1D95),
                                         fontSize: 13))),
                           ],
                         ),
                       )),
-                  const Divider(color: Color(0xFFDDD6FE), height: 20),
-                  const Text('Veterinario',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF7C3AED))),
+                  Divider(color: context.appBorder, height: 20),
+                  Text('Veterinario',
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: context.isDarkMode
+                              ? const Color(0xFFC4B5FD)
+                              : const Color(0xFF7C3AED))),
                   Text(stage.vetVisits,
-                      style: const TextStyle(color: Color(0xFF4C1D95))),
+                      style: TextStyle(
+                          color: context.isDarkMode
+                              ? const Color(0xFFE9D5FF)
+                              : const Color(0xFF4C1D95))),
                 ],
               ),
             ),
@@ -380,7 +402,10 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-            color: color, borderRadius: BorderRadius.circular(16)),
+          color: context.softTint(color),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: context.appBorder.withValues(alpha: 0.7)),
+        ),
         child: Column(
           children: [
             Text(emoji, style: const TextStyle(fontSize: 20)),
@@ -389,7 +414,7 @@ class _StatCard extends StatelessWidget {
                 style:
                     const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
             Text(label,
-                style: const TextStyle(fontSize: 10, color: Colors.black54),
+                style: TextStyle(fontSize: 10, color: context.softText),
                 textAlign: TextAlign.center),
           ],
         ),
@@ -410,7 +435,7 @@ class _DataRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey[600])),
+          Text(label, style: TextStyle(color: context.softText)),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
@@ -445,7 +470,10 @@ class _ProfileAction extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
-              color: color, borderRadius: BorderRadius.circular(16)),
+            color: context.softTint(color),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: context.appBorder.withValues(alpha: 0.7)),
+          ),
           child: Column(
             children: [
               Icon(icon, size: 24),
