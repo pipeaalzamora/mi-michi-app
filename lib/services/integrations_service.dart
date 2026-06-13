@@ -40,6 +40,27 @@ class IntegrationsService {
     return CataasImageInfo.fromJson(Map<String, dynamic>.from(res.data));
   }
 
+  static Future<List<CareTipInfo>> careTips({
+    String? query,
+    String? category,
+    int limit = 20,
+  }) async {
+    final res = await ApiClient.dio.get(
+      '/api/integrations/care-tips',
+      queryParameters: {
+        'limit': limit,
+        if (query != null && query.trim().isNotEmpty) 'q': query.trim(),
+        if (category != null &&
+            category.trim().isNotEmpty &&
+            category.trim() != 'Todos')
+          'category': category.trim(),
+      },
+    );
+    return (res.data as List)
+        .map((e) => CareTipInfo.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+  }
+
   static Future<FoodProduct> foodProduct(String barcode) async {
     final res =
         await ApiClient.dio.get('/api/integrations/food-products/$barcode');

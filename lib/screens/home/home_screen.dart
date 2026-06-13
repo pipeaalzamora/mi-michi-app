@@ -34,6 +34,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<HealthLog> _weightLogs = [];
   CataasImageInfo? _catImage;
+  CareTipInfo? _dailyTip;
 
   @override
   void initState() {
@@ -61,6 +62,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final image = await IntegrationsService.catImage();
       if (mounted) setState(() => _catImage = image);
     } catch (_) {}
+    try {
+      final tips = await IntegrationsService.careTips(limit: 20);
+      if (mounted && tips.isNotEmpty) {
+        setState(() => _dailyTip = tips[DateTime.now().day % tips.length]);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -68,7 +75,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final catsState = ref.watch(catsProvider);
     final catTheme = ref.watch(catThemeProvider);
     final activeCat = catsState.activeCat;
-    final tip = _tips[DateTime.now().day % _tips.length];
+    final tip = _dailyTip?.text ?? _tips[DateTime.now().day % _tips.length];
 
     // Recargar peso cuando cambia el gato activo
     ref.listen(catsProvider, (prev, next) {

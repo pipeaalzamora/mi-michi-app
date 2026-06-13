@@ -37,6 +37,33 @@ class CatFactInfo {
       );
 }
 
+class CareTipInfo {
+  final String id;
+  final String category;
+  final String emoji;
+  final String title;
+  final String text;
+  final String source;
+
+  const CareTipInfo({
+    required this.id,
+    required this.category,
+    required this.emoji,
+    required this.title,
+    required this.text,
+    required this.source,
+  });
+
+  factory CareTipInfo.fromJson(Map<String, dynamic> json) => CareTipInfo(
+        id: json['id']?.toString() ?? '',
+        category: json['category']?.toString() ?? '',
+        emoji: json['emoji']?.toString() ?? '🐾',
+        title: json['title']?.toString() ?? '',
+        text: json['text']?.toString() ?? '',
+        source: json['source']?.toString() ?? '',
+      );
+}
+
 class CataasImageInfo {
   final String id;
   final String url;
