@@ -47,17 +47,19 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     });
     try {
       final logs = await HealthService.list(catId);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _logs = logs;
           _loading = false;
         });
+      }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _error = e.toString();
           _loading = false;
         });
+      }
     }
   }
 
@@ -410,7 +412,7 @@ class _LogFormState extends ConsumerState<_LogForm> {
                   const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            value: _logType,
+            initialValue: _logType,
             decoration: const InputDecoration(labelText: 'Tipo'),
             items: logMetaMap.entries
                 .map((e) => DropdownMenuItem(

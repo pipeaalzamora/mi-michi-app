@@ -33,18 +33,26 @@ GoRouter _createRouter({
           return null;
         }
         if (auth.status == AuthStatus.loading) {
-          return location == '/login' ? null : '/login';
+          // Mientras se resuelve la autenticación mostramos el splash en vez
+          // de un "flash" de la pantalla de login.
+          return location == '/splash' ? null : '/splash';
         }
-        if (auth.status == AuthStatus.unauthenticated && location != '/login') {
+        // Ya se resolvió el estado: sacamos al usuario del splash.
+        if (auth.status == AuthStatus.authenticated) {
+          if (location == '/login' || location == '/splash') {
+            return '/';
+          }
+          return null;
+        }
+        // unauthenticated
+        if (location != '/login') {
           return '/login';
-        }
-        if (auth.status == AuthStatus.authenticated && location == '/login') {
-          return '/';
         }
         return null;
       },
       routes: [
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+        GoRoute(path: '/splash', builder: (_, __) => const _SplashScreen()),
         GoRoute(
             path: '/onboarding', builder: (_, __) => const OnboardingScreen()),
         ShellRoute(
@@ -122,6 +130,35 @@ class _MiMichiAppState extends ConsumerState<MiMichiApp> {
       themeMode: themeMode,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+// Pantalla de carga mostrada mientras se resuelve la autenticación.
+class _SplashScreen extends StatelessWidget {
+  const _SplashScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Mi Michi 🐾',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 24),
+            const CircularProgressIndicator(),
+          ],
+        ),
+      ),
     );
   }
 }

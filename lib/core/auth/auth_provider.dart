@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../../models/user_profile.dart';
 import '../api/api_client.dart';
 import '../cats/cats_provider.dart';

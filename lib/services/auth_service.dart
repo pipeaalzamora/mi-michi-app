@@ -13,47 +13,54 @@ class AuthService {
   );
 
   static final _firebaseAuth = FirebaseAuth.instance;
-  static final _googleSignIn = GoogleSignIn(
-    serverClientId:
+  static const _serverClientId = String.fromEnvironment(
+    'GOOGLE_SERVER_CLIENT_ID',
+    defaultValue:
         '1057417146171-kmie6i3dh6giduvuopejeqi2nsqh76de.apps.googleusercontent.com',
-    scopes: ['openid', 'email', 'profile'],
   );
+
+  static final _googleSignIn = GoogleSignIn.instance;
+  static bool _googleInitialized = false;
+
+  static Future<void> _ensureGoogleInitialized() async {
+    if (_googleInitialized) return;
+    await _googleSignIn.initialize(serverClientId: _serverClientId);
+    _googleInitialized = true;
+  }
 
   static Future<UserProfile> signInWithGoogle() async {
     if (_devAuth) return _devUser;
 
+    await _ensureGoogleInitialized();
+
+    // Cierra cualquier sesión previa para forzar el selector de cuenta.
     await _googleSignIn.signOut();
 
-    GoogleSignInAccount? googleUser;
+    GoogleSignInAccount googleUser;
     try {
-      googleUser = await _googleSignIn.signIn();
+      googleUser = await _googleSignIn.authenticate(
+        scopeHint: const ['email', 'profile'],
+      );
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        throw Exception('Login cancelado por el usuario');
+      }
+      throw Exception(
+          'Error en Google Sign-In: ${e.description ?? e.code.name}');
     } catch (e) {
       throw Exception('Error en Google Sign-In: $e');
     }
 
-    googleUser ??= await _googleSignIn.signInSilently();
-
-    if (googleUser == null) {
-      throw Exception('Login cancelado por el usuario');
-    }
-
-    GoogleSignInAuthentication googleAuth;
-    try {
-      googleAuth = await googleUser.authentication;
-    } catch (e) {
-      throw Exception('Error obteniendo tokens: $e');
-    }
-
+    // En google_sign_in 7.x `authentication` es un getter síncrono que solo
+    // expone el idToken (los access tokens de scopes van por authorizationClient).
+    final googleAuth = googleUser.authentication;
     final idToken = googleAuth.idToken;
     if (idToken == null) {
       throw Exception(
           'No se obtuvo el ID token. Verifica que Google Sign-In esté habilitado en Firebase Auth.');
     }
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: idToken,
-    );
+    final credential = GoogleAuthProvider.credential(idToken: idToken);
     final userCredential = await _firebaseAuth.signInWithCredential(credential);
     final firebaseToken = await userCredential.user?.getIdToken();
     if (firebaseToken == null) {
@@ -91,6 +98,7 @@ class AuthService {
   static Future<void> signOut() async {
     if (_devAuth) return;
 
+    await _ensureGoogleInitialized();
     await Future.wait([
       _googleSignIn.signOut(),
       _firebaseAuth.signOut(),

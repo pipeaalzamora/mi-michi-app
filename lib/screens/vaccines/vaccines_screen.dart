@@ -51,17 +51,19 @@ class _VaccinesScreenState extends ConsumerState<VaccinesScreen> {
     });
     try {
       final vaccines = await VaccinesService.list(catId);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _vaccines = vaccines;
           _loading = false;
         });
+      }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _error = e.toString();
           _loading = false;
         });
+      }
     }
   }
 
@@ -458,9 +460,10 @@ class _VaccineFormState extends ConsumerState<_VaccineForm> {
                       firstDate: DateTime(2000),
                       lastDate: DateTime.now(),
                     );
-                    if (d != null)
+                    if (d != null) {
                       setState(() =>
                           _appliedDate = d.toIso8601String().split('T').first);
+                    }
                   },
                   child: AbsorbPointer(
                     child: TextField(
@@ -482,9 +485,10 @@ class _VaccineFormState extends ConsumerState<_VaccineForm> {
                       firstDate: DateTime.now(),
                       lastDate: DateTime(2040),
                     );
-                    if (d != null)
+                    if (d != null) {
                       setState(() =>
                           _nextDueDate = d.toIso8601String().split('T').first);
+                    }
                   },
                   child: AbsorbPointer(
                     child: TextField(

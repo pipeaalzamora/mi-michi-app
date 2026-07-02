@@ -7,7 +7,6 @@ import '../../core/theme/app_theme.dart';
 import '../../core/theme/theme_extensions.dart';
 import '../../data/life_stages.dart';
 import '../../models/health_log.dart';
-import '../../models/vaccine.dart';
 import '../../widgets/cat_share_card.dart';
 import '../../widgets/cat_avatar_visual.dart';
 import 'cat_gallery_screen.dart';
@@ -52,27 +51,6 @@ final _demoLogs = [
       title: 'Antiparasitario',
       createdAt: DateTime(2026, 2, 20),
       updatedAt: DateTime(2026, 2, 20)),
-];
-
-final _demoVaccines = [
-  Vaccine(
-      id: 'v1',
-      catId: 'cat-1',
-      userId: 'demo-user',
-      name: 'Trivalente felina',
-      appliedDate: '2025-10-01',
-      nextDueDate: '2026-10-01',
-      createdAt: DateTime(2025, 10, 1),
-      updatedAt: DateTime(2025, 10, 1)),
-  Vaccine(
-      id: 'v2',
-      catId: 'cat-1',
-      userId: 'demo-user',
-      name: 'Rabia',
-      appliedDate: '2025-10-01',
-      nextDueDate: '2026-05-15',
-      createdAt: DateTime(2025, 10, 1),
-      updatedAt: DateTime(2025, 10, 1)),
 ];
 
 class CatProfileScreen extends ConsumerWidget {

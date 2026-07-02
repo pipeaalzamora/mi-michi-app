@@ -40,7 +40,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         color: Colors.white,
-        shadowColor: primary.withOpacity(0.12),
+        shadowColor: primary.withValues(alpha: 0.12),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

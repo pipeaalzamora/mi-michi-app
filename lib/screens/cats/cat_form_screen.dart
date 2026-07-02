@@ -289,7 +289,7 @@ class _CatFormScreenState extends ConsumerState<CatFormScreen> {
 
             // Sexo
             DropdownButtonFormField<String>(
-              value: _sex,
+              initialValue: _sex,
               decoration: const InputDecoration(labelText: 'Sexo'),
               items: const [
                 DropdownMenuItem(value: 'macho', child: Text('Macho')),

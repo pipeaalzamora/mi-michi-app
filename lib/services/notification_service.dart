@@ -17,9 +17,37 @@ class NotificationService {
       requestSoundPermission: true,
     );
     await _plugin.initialize(
-      const InitializationSettings(android: android, iOS: ios),
+      settings: const InitializationSettings(android: android, iOS: ios),
     );
+
+    await requestPermissions();
+
     _initialized = true;
+  }
+
+  /// Solicita los permisos de notificación necesarios en cada plataforma.
+  ///
+  /// - Android 13+ (API 33) requiere el permiso runtime POST_NOTIFICATIONS.
+  /// - iOS requiere solicitar alert/badge/sound.
+  ///
+  /// Si la implementación específica de la plataforma es null (p. ej. en
+  /// plataformas no soportadas) simplemente no hace nada.
+  static Future<void> requestPermissions() async {
+    final androidImpl = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (androidImpl != null) {
+      await androidImpl.requestNotificationsPermission();
+    }
+
+    final iosImpl = _plugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    if (iosImpl != null) {
+      await iosImpl.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    }
   }
 
   /// Programa una notificación para el día anterior a la fecha de la vacuna.
@@ -36,11 +64,11 @@ class NotificationService {
     final scheduledDate = tz.TZDateTime.from(reminderDate, tz.local);
 
     await _plugin.zonedSchedule(
-      id,
-      '💉 Vacuna mañana — $catName',
-      '$vaccineName vence mañana. ¡No olvides la cita!',
-      scheduledDate,
-      const NotificationDetails(
+      id: id,
+      scheduledDate: scheduledDate,
+      title: '💉 Vacuna mañana — $catName',
+      body: '$vaccineName vence mañana. ¡No olvides la cita!',
+      notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'vaccines_channel',
           'Recordatorios de vacunas',
@@ -56,13 +84,11 @@ class NotificationService {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
     );
   }
 
   static Future<void> cancelVaccineReminder(int id) async {
-    await _plugin.cancel(id);
+    await _plugin.cancel(id: id);
   }
 
   static Future<void> cancelAll() async {

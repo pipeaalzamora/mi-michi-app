@@ -1,5 +1,4 @@
 import 'dart:ui' as ui;
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:share_plus/share_plus.dart';
@@ -46,7 +45,7 @@ class CatShareCard extends StatelessWidget {
                   cat.photoUrl != null ? NetworkImage(cat.photoUrl!) : null,
               child: cat.photoUrl == null
                   ? Text(
-                      cat.name.substring(0, 2).toUpperCase(),
+                      cat.name.characters.take(2).toString().toUpperCase(),
                       style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w800,
@@ -132,9 +131,11 @@ Future<void> shareCatCard(GlobalKey repaintKey, String catName) async {
     final file = File('${dir.path}/michi_$catName.png');
     await file.writeAsBytes(bytes);
 
-    await Share.shareXFiles(
-      [XFile(file.path)],
-      text: '¡Mira a $catName en Mi Michi! 🐾',
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(file.path)],
+        text: '¡Mira a $catName en Mi Michi! 🐾',
+      ),
     );
   } catch (e) {
     debugPrint('Error sharing: $e');
